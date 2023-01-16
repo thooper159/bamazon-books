@@ -1,2 +1,2 @@
 # CS-T480 HW 1
-## Tyler Hooper | tjh346
+By Tyler Hooper | tjh346
