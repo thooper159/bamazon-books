@@ -40,7 +40,7 @@ await db.get("PRAGMA foreign_keys = ON");
 // select examples
 let authors = await db.all("SELECT * FROM authors");
 console.log("Authors", authors);
-let books = await db.all("SELECT * FROM books WHERE author_id = '1'");
+let books = await db.all("SELECT * FROM books");
 console.log("Books", books);
 
 //
@@ -78,95 +78,98 @@ app.delete("/foo", (req, res) => {
 
 // POST, GET, DELETE rquests to create, fetch, and delete resources
 
-type Genre =
-    | "romance"
-    | "adventure"
-    | "horror"
-    | "mystery"
-    | "fantasy"
-    | "sci-fi";
-interface Book {
-    id: number;
+type Book = {
     author_id: string;
     title: string;
     pub_year: string;
-    genre: Genre;
-}
-interface Author {
-    id: number;
+    genre:
+        | "adventure"
+        | "romance"
+        | "horror"
+        | "mystery"
+        | "fantasy"
+        | "sci-fi";
+};
+type BookRow = { id: string } & Book;
+
+type Author = {
     name: string;
     bio: string;
-}
+};
+type AuthorRow = { id: string } & Author;
 
 interface Error {
     error: string;
 }
-type BookResponse = Response<Book[] | Error>;
+type BookResponse = Response<BookRow[] | Error>;
 
-type AuthorResponse = Response<Author[] | Error>;
+type AuthorResponse = Response<AuthorRow[] | Error>;
 
 app.get("/books", async (req, res: BookResponse) => {
+    let numParams = Object.keys(req.query).length;
     let books;
-    // no query -- return all books
-    // query by author_id
-    if (req.query.author_id) {
-        books = await db.all("SELECT * FROM books WHERE author_id = ?", [
-            req.query.author_id,
-        ]);
+    let params = [];
+    let query = "SELECT * FROM books";
+
+    if (numParams === 0) {
+        books = await db.all(query);
     }
-    // query by pub_year
-    else if (req.query.pub_year) {
-        books = await db.all("SELECT * FROM books WHERE pub_year = ?", [
-            req.query.pub_year,
-        ]);
+    //add all the query params to the query
+    else {
+        query += " WHERE ";
+        //iterate through query params if they are valid
+        for (let key in req.query) {
+            if (
+                key === "author_id" ||
+                key === "pub_year" ||
+                key === "genre" ||
+                key === "title" ||
+                key === "id"
+            ) {
+                query += `${key} = ? AND `;
+                params.push(req.query[key]);
+            } else {
+                return res
+                    .status(400)
+                    .json({ error: "Invalid query param: " + key });
+            }
+        }
+        //remove the last AND
+        query = query.slice(0, -5);
+        console.log(query, params);
+        books = await db.all(query, params);
     }
-    // query by title
-    else if (req.query.title) {
-        books = await db.all("SELECT * FROM books WHERE title = ?", [
-            req.query.title,
-        ]);
-    }
-    // query by genre
-    else if (req.query.genre) {
-        //TODO maybe check if genre is valid and tell the user if it isnt
-        books = await db.all("SELECT * FROM books WHERE genre = ?", [
-            req.query.genre,
-        ]);
-    } else {
-        books = await db.all("SELECT * FROM books");
-    }
-    if (books.length === 0) {
-        //return 204 if no books found
+    if (!books) {
         return res.status(204).json({ error: "No books found" });
     } else {
-        //return 200 if books found
         return res.json(books);
     }
 });
 
 app.post("/books", async (req, res: BookResponse) => {
-    //make sure all fields are present
+    //make sure req body is type Book
     if (
         !req.body.author_id ||
         !req.body.title ||
         !req.body.pub_year ||
         !req.body.genre
     ) {
-        return res.status(400).json({ error: "Missing fields" });
+        return res.status(400).json({ error: "Missing required fields" });
     }
     //make sure genre is valid
     if (
-        ![
-            "romance",
-            "adventure",
-            "horror",
-            "mystery",
-            "fantasy",
-            "sci-fi",
-        ].includes(req.body.genre)
+        !(
+            req.body.genre === "adventure" ||
+            req.body.genre === "romance" ||
+            req.body.genre === "horror" ||
+            req.body.genre === "mystery" ||
+            req.body.genre === "fantasy" ||
+            req.body.genre === "sci-fi"
+        )
     ) {
         return res.status(400).json({ error: "Invalid genre" });
     }
+
     //make sure book with same title and year and author doesnt already exist
     let book = await db.get(
         "SELECT * FROM books WHERE title = ? AND pub_year = ? AND author_id = ?",
@@ -204,6 +207,47 @@ app.post("/books", async (req, res: BookResponse) => {
     //return book just created
     book = await db.get("SELECT * FROM books WHERE id = ?", [id]);
     return res.status(201).json([book]);
+});
+
+app.delete("/books", async (req, res: BookResponse) => {
+    if (!req.query.id) {
+        return res.status(400).json({ error: "Id is required" });
+    }
+    let book = await db.get("SELECT * FROM books WHERE id = ?", [req.query.id]);
+    if (!book) {
+        return res.status(400).json({ error: "Book does not exist" });
+    }
+    await db.run("DELETE FROM books WHERE id = ?", [req.query.id]);
+    return res.sendStatus(200);
+});
+
+app.get("/authors", async (req, res: AuthorResponse) => {
+    let authors;
+    let numParams = Object.keys(req.query).length;
+
+    if (numParams === 0) {
+        authors = await db.all("SELECT * FROM authors");
+    } else if (numParams > 1) {
+        return res.status(400).json({ error: "Too many query params" });
+    } else {
+        if (req.query.name) {
+            authors = await db.all("SELECT * FROM authors WHERE name = ?", [
+                req.query.name,
+            ]);
+        } else if (req.query.id) {
+            authors = await db.all("SELECT * FROM authors WHERE id = ?", [
+                req.query.id,
+            ]);
+        } else {
+            authors = await db.all("SELECT * FROM authors");
+        }
+    }
+
+    if (!authors) {
+        return res.status(204).json({ error: "No authors found" });
+    } else {
+        return res.json(authors);
+    }
 });
 
 app.post("/authors", async (req, res: AuthorResponse) => {
