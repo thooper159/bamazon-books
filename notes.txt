@@ -1,0 +1,15 @@
+Should users have to create unique IDs for their resources, or will you do that for them? If the former, how
+will they know what kind of IDs to create and if they’re unique? If the latter, how will you return that ID
+to them (as they’ll need the ID to perform future actions on that resource)?
+--> I will create the unique IDs for the resources. I will return the ID to the user in the response body of
+    the POST request.
+
+
+Any data accepted from a client needs to be validated to ensure it’s correct. What constraints should you
+enforce? Will you restrict genres to a certain subset of values?
+
+
+
+
+Books are associated with authors. Should you be able to create a book without a valid author ID? Should
+you be able to delete an author that still has books associated with them?

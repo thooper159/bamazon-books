@@ -1,6 +1,6 @@
 CREATE TABLE books (
     id INTEGER PRIMARY KEY, -- can change to be integer if you want
-    author_id TEXT,
+    author_id INTEGER,
     title TEXT,
     pub_year TEXT,
     genre TEXT,
@@ -8,7 +8,7 @@ CREATE TABLE books (
 );
 
 CREATE TABLE authors (
-    id INTEGER PRIMARY KEY, -- can change to be integer if you want ok :)
+    id INTEGER PRIMARY KEY, -- can change to be integer if you want
     name TEXT,
     bio TEXT
 );
