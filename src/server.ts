@@ -41,7 +41,7 @@ type AuthorResponse = Response<AuthorRow[] | Error>;
 
 app.get("/books", async (req, res: BookResponse) => {
     let numParams = Object.keys(req.query).length;
-    let books;
+    let books: BookRow[];
     let params = [];
     let query = "SELECT * FROM books";
 
@@ -97,6 +97,8 @@ app.get("/books/:id", async (req, res: BookResponse) => {
 
 app.post("/books", async (req, res: BookResponse) => {
     //make sure req body is type Book
+    //make sure req body matches Book type
+
     if (!req.body.author_id) {
         return res.status(400).json({ error: "Missing author_id" });
     }
@@ -130,7 +132,7 @@ app.post("/books", async (req, res: BookResponse) => {
     }
 
     //make sure book with same title and year and author doesnt already exist
-    let book = await db.get(
+    let book: BookRow[] | undefined = await db.get(
         "SELECT * FROM books WHERE title = ? AND pub_year = ? AND author_id = ?",
         [req.body.title, req.body.pub_year, req.body.author_id]
     );
@@ -139,7 +141,7 @@ app.post("/books", async (req, res: BookResponse) => {
         return res.status(400).json({ error: "Book already exists" });
     }
     //make sure author exists
-    let author = await db.get("SELECT * FROM authors WHERE id = ?", [
+    let author: AuthorRow[] | undefined = await db.get("SELECT * FROM authors WHERE id = ?", [
         req.body.author_id,
     ]);
     if (!author) {
@@ -179,7 +181,7 @@ app.delete("/books/:id", async (req, res: BookResponse) => {
         return res.status(400).json({ error: "Invalid id" });
     }
 
-    let book = await db.get("SELECT * FROM books WHERE id = ?", [
+    let book: BookRow[] | undefined = await db.get("SELECT * FROM books WHERE id = ?", [
         req.params.id,
     ]);
     if (!book) {
@@ -190,7 +192,7 @@ app.delete("/books/:id", async (req, res: BookResponse) => {
 });
 
 app.get("/authors", async (req, res: AuthorResponse) => {
-    let authors;
+    let authors: AuthorRow[];
     let numParams = Object.keys(req.query).length;
 
     if (numParams === 0) {
@@ -218,7 +220,7 @@ app.get("/authors/:id", async (req, res: AuthorResponse) => {
     if (isNaN(Number(req.params.id))) {
         return res.status(400).json({ error: "Invalid author id" });
     }
-    let author = await db.get("SELECT * FROM authors WHERE id = ?", [
+    let author: AuthorRow[] | undefined = await db.get("SELECT * FROM authors WHERE id = ?", [
         req.params.id,
     ]);
     if (!author) {
@@ -237,7 +239,7 @@ app.post("/authors", async (req, res: AuthorResponse) => {
         return res.status(400).json({ error: "Missing bio" });
     }
     //make sure author doesn't already exist
-    let author = await db.get("SELECT * FROM authors WHERE name = ?", [
+    let author: AuthorRow[] | undefined = await db.get("SELECT * FROM authors WHERE name = ?", [
         req.body.name,
     ]);
     if (author) {
