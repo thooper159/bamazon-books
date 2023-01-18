@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import url from "url";
+import { stat } from "fs";
 
 let port = 3000;
 let host = "localhost";
@@ -17,40 +18,7 @@ let db = await open({
     filename: dbfile,
     driver: sqlite3.Database,
 });
-
 await db.get("PRAGMA foreign_keys = ON");
-
-// test("GET /foo?bar returns message", async () => {
-//     let bar = "xyzzy";
-//     let { data } = await axios.get(`${baseUrl}/foo?bar=${bar}`);
-//     expect(data).toEqual({ message: `You sent: ${bar} in the query` });
-// });
-
-// test("GET /foo returns error", async () => {
-//     try {
-//         await axios.get(`${baseUrl}/foo`);
-//     } catch (error) {
-//         // casting needed b/c typescript gives errors "unknown" type
-//         let errorObj = error as AxiosError;
-//         // if server never responds, error.response will be undefined
-//         // throw the error so typescript can perform type narrowing
-//         if (errorObj.response === undefined) {
-//             throw errorObj;
-//         }
-//         // now, after the if-statement, typescript knows
-//         // that errorObj can't be undefined
-//         let { response } = errorObj;
-//         // TODO this test will fail, replace 300 with 400
-//         expect(response.status).toEqual(400);
-//         expect(response.data).toEqual({ error: "bar is required" });
-//     }
-// });
-
-// test("POST /bar works good", async () => {
-//     let bar = "xyzzy";
-//     let result = await axios.post(`${baseUrl}/foo`, { bar });
-//     expect(result.data).toEqual({ message: `You sent: ${bar} in the body` });
-// });
 
 //The data from the books table
 const someBooks = [
@@ -251,6 +219,21 @@ describe("GET /books", () => {
             });
         }
     });
+    test("Query with multiple parameters, one parameter is incorrect", async () => {
+        try {
+            await axios.get(`${baseUrl}/books?author_id=5&foo=bar`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid query param: foo",
+            });
+        }
+    });
 });
 
 describe("GET /books/:id", () => {
@@ -304,7 +287,7 @@ describe("GET /books/:id", () => {
         });
     });
 
-    test("Invalid id returns error", async () => {
+    test("Nonexistant id returns error", async () => {
         try {
             await axios.get(`${baseUrl}/books/8`);
         } catch (error) {
@@ -477,6 +460,27 @@ describe("POST /books", () => {
         }
     });
 
+    test("Invalid pub_year returns error", async () => {
+        try {
+            await axios.post(`${baseUrl}/books`, {
+                author_id: 1,
+                title: "Fahrenheit 451",
+                pub_year: "foo year",
+                genre: "dystopian",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid pub_year",
+            });
+        }
+    });
+
     test("Missing genre returns error", async () => {
         try {
             await axios.post(`${baseUrl}/books`, {
@@ -540,7 +544,6 @@ describe("POST /books", () => {
 //DELETE books
 describe("DELETE /books/:id", () => {
     beforeEach(async () => {
-        console.log("Deleting all books");
         await db.exec("DELETE FROM books");
         await db.exec("DELETE FROM authors");
         await db.exec(
@@ -558,7 +561,6 @@ describe("DELETE /books/:id", () => {
         await db.exec(
             "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (2, 2, 'The Hobbit', '1937', 'fantasy')"
         );
-        console.log("Database reset");
     });
 
     //Delete book returns 200 status
@@ -574,13 +576,467 @@ describe("DELETE /books/:id", () => {
             expect(response.status).toEqual(200);
         }
     });
+
+    //Missing id returns error
+    test("Missing id returns error", async () => {
+        try {
+            await axios.delete(`${baseUrl}/books`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(405);
+            expect(response.data).toEqual({
+                error: "Method not allowed. Id must be specified",
+            });
+        }
+    });
+    //Invalid id returns error
+    test("Invalid id returns error", async () => {
+        try {
+            await axios.delete(`${baseUrl}/books/abc`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid id",
+            });
+        }
+    });
+
+    //Nonexistant id returns error
+    test("Nonexistant id returns error", async () => {
+        try {
+            await axios.delete(`${baseUrl}/books/3`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(404);
+            expect(response.data).toEqual({
+                error: "Book not found",
+            });
+        }
+    });
+
+    //Cannot delete deleted book
+    test("Cannot delete deleted book", async () => {
+        try {
+            await axios.delete(`${baseUrl}/books/1`);
+            await axios.delete(`${baseUrl}/books/1`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(404);
+            expect(response.data).toEqual({
+                error: "Book not found",
+            });
+        }
+    });
 });
 
 //GET authors
-describe("GET /authors", () => {});
+describe("GET /authors", () => {
+    beforeAll(async () => {
+        await db.exec("DELETE FROM books");
+        await db.exec("DELETE FROM authors");
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (1, 'Ray Bradbury', 'American author')"
+        );
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (2, 'J.R.R. Tolkien', 'English author')"
+        );
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (3, 'J.K. Rowling', 'English author')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (1, 1, 'Anthem', '1938','dystopian')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (2, 2, 'The Hobbit', '1937','fantasy')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (3, 3, 'Harry Potter and the Sorcerer''s Stone', '1997','fantasy')"
+        );
+    });
+
+    //No arguments returns all authors
+    test("No arguments returns all authors", async () => {
+        let { data } = await axios.get(`${baseUrl}/authors`);
+        expect(data).toEqual([
+            {
+                id: 1,
+                name: "Ray Bradbury",
+                bio: "American author",
+            },
+            {
+                id: 2,
+                name: "J.R.R. Tolkien",
+                bio: "English author",
+            },
+            {
+                id: 3,
+                name: "J.K. Rowling",
+                bio: "English author",
+            },
+        ]);
+    });
+
+    //Query by name returns author with matching name
+    test("Query by name returns author with matching name", async () => {
+        let { data } = await axios.get(`${baseUrl}/authors?name=J.K. Rowling`);
+        expect(data).toEqual([
+            {
+                id: 3,
+                name: "J.K. Rowling",
+                bio: "English author",
+            },
+        ]);
+    });
+
+    //Query by name that doesnt exist returns empty array
+    test("Query by name that doesnt exist returns empty array", async () => {
+        let { data } = await axios.get(`${baseUrl}/authors?name=Stephen King`);
+        expect(data).toEqual([]);
+    });
+
+    //Invalid query returns error
+    test("Invalid query returns error", async () => {
+        try {
+            await axios.get(`${baseUrl}/authors?foo=bar`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid query param",
+            });
+        }
+    });
+
+    //Invalid query value returns error
+    test("More than one query returns error", async () => {
+        try {
+            await axios.get(`${baseUrl}/authors?name=J.K. Rowling&age=30`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Too many query params",
+            });
+        }
+    });
+
+    //
+});
+
+//GET authors/:id
+describe("GET /authors/:id", () => {
+    beforeAll(async () => {
+        await db.exec("DELETE FROM books");
+        await db.exec("DELETE FROM authors");
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (1, 'Ray Bradbury', 'American author')"
+        );
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (2, 'J.R.R. Tolkien', 'English author')"
+        );
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (3, 'J.K. Rowling', 'English author')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (1, 1, 'Anthem', '1938','dystopian')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (2, 2, 'The Hobbit', '1937','fantasy')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (3, 3, 'Harry Potter and the Sorcerer''s Stone', '1997','fantasy')"
+        );
+    });
+    //Valid id returns author
+    test("Valid id returns author", async () => {
+        let { data } = await axios.get(`${baseUrl}/authors/1`);
+        expect(data).toEqual({
+            id: 1,
+            name: "Ray Bradbury",
+            bio: "American author",
+        });
+    });
+
+    //Nonexistant id returns error
+    test("Nonexistant id returns error", async () => {
+        try {
+            await axios.get(`${baseUrl}/authors/4`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(404);
+            expect(response.data).toEqual({
+                error: "Author not found",
+            });
+        }
+    });
+
+    //Invalid id type
+    test("Invalid id type returns error", async () => {
+        try {
+            await axios.get(`${baseUrl}/authors/foo`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid author id",
+            });
+        }
+    });
+});
 
 //POST authors
-describe("POST /authors", () => {});
+describe("POST /authors", () => {
+    beforeEach(async () => {
+        await db.exec("DELETE FROM books");
+        await db.exec("DELETE FROM authors");
+    });
+
+    //Valid data returns new author
+    test("Valid data returns new author", async () => {
+        let { data } = await axios.post(`${baseUrl}/authors`, {
+            name: "Stephen King",
+            bio: "American author",
+        });
+        expect(data).toEqual({
+            id: 1,
+            name: "Stephen King",
+            bio: "American author",
+        });
+    });
+
+    //Author already exists returns error
+    test("Author already exists returns error", async () => {
+        try {
+            await axios.post(`${baseUrl}/authors`, {
+                name: "Stephen King",
+                bio: "American author",
+            });
+            await axios.post(`${baseUrl}/authors`, {
+                name: "Stephen King",
+                bio: "American author",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Author already exists",
+            });
+        }
+    });
+
+    //Missing name returns error
+    test("Missing name returns error", async () => {
+        try {
+            await axios.post(`${baseUrl}/authors`, {
+                bio: "American author",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Missing name",
+            });
+        }
+    });
+
+    //Missing bio returns error\
+    test("Missing bio returns error", async () => {
+        try {
+            await axios.post(`${baseUrl}/authors`, {
+                name: "Stephen King",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Missing bio",
+            });
+        }
+    });
+
+    //ID is autoincremented
+    test("ID is autoincremented", async () => {
+        let { data } = await axios.post(`${baseUrl}/authors`, {
+            name: "Stephen King",
+            bio: "American author",
+        });
+        expect(data).toEqual({
+            id: 1,
+            name: "Stephen King",
+            bio: "American author",
+        });
+        let { data: data2 } = await axios.post(`${baseUrl}/authors`, {
+            name: "J.K. Rowling",
+            bio: "English author",
+        });
+        expect(data2).toEqual({
+            id: 2,
+            name: "J.K. Rowling",
+            bio: "English author",
+        });
+    });
+});
 
 //DELETE authors
-describe("DELETE /authors", () => {});
+
+//JK Rowling has no books
+//Tolkien has 1 book
+//Bradbury has 1 book
+describe("DELETE /authors/:id", () => {
+    beforeEach(async () => {
+        await db.exec("DELETE FROM books");
+        await db.exec("DELETE FROM authors");
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (1, 'Ray Bradbury', 'American author')"
+        );
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (2, 'J.R.R. Tolkien', 'English author')"
+        );
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (3, 'J.K. Rowling', 'English author')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (1, 1, 'Anthem', '1938','dystopian')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (2, 2, 'The Hobbit', '1937','fantasy')"
+        );
+    });
+
+    //Delete author with no books
+    test("Delete author with no books", async () => {
+        let { status } = await axios.delete(`${baseUrl}/authors/3`);
+        expect(status).toEqual(200);
+    });
+
+    //Delete author with books returns error
+    test("Delete author with books returns error", async () => {
+        try {
+            await axios.delete(`${baseUrl}/authors/1`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Author has books",
+            });
+        }
+    });
+
+    //Missing id returns error
+    test("Missing id returns error", async () => {
+        try {
+            await axios.delete(`${baseUrl}/authors/`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(405);
+            expect(response.data).toEqual({
+                error: "Method not allowed. Id must be specified",
+            });
+        }
+    });
+
+    //Invalid id returns error
+    test("Invalid id returns error", async () => {
+        try {
+            await axios.delete(`${baseUrl}/authors/abc`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid id",
+            });
+        }
+    });
+
+    //Nonexistent id returns error
+    test("Nonexistent id returns error", async () => {
+        try {
+            await axios.delete(`${baseUrl}/authors/4`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(404);
+            expect(response.data).toEqual({
+                error: "Author not found",
+            });
+        }
+    });
+
+    //Cannot delete deleted author
+    test("Cannot delete deleted author", async () => {
+        await axios.delete(`${baseUrl}/authors/3`);
+        try {
+            await axios.delete(`${baseUrl}/authors/3`);
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(404);
+            expect(response.data).toEqual({
+                error: "Author not found",
+            });
+        }
+    });
+});

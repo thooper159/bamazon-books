@@ -12,14 +12,6 @@ let db = await open({
 });
 await db.get("PRAGMA foreign_keys = ON");
 
-// // select examples
-// let authors = await db.all("SELECT * FROM authors");
-// console.log("Authors", authors);
-// let books = await db.all("SELECT * FROM books");
-// console.log("Books", books);
-
-// POST, GET, DELETE rquests to create, fetch, and delete resources
-
 type Book = {
     author_id: string;
     title: string;
@@ -57,7 +49,9 @@ app.get("/books", async (req, res: BookResponse) => {
         books = await db.all(query);
     }
     //add all the query params to the query
-    else {
+    else if (numParams > 4) {
+        return res.status(400).json({ error: "Too many query params" });
+    } else {
         query += " WHERE ";
         //iterate through query params if they are valid
         for (let key in req.query) {
@@ -77,7 +71,6 @@ app.get("/books", async (req, res: BookResponse) => {
         }
         //remove the last AND
         query = query.slice(0, -5);
-        console.log(query, params);
         books = await db.all(query, params);
     }
     if (!books) {
@@ -131,6 +124,11 @@ app.post("/books", async (req, res: BookResponse) => {
         return res.status(400).json({ error: "Invalid genre" });
     }
 
+    //make sure pub_year is a year (CE years only, BCE coming soon)
+    if (isNaN(Number(req.body.pub_year))) {
+        return res.status(400).json({ error: "Invalid pub_year" });
+    }
+
     //make sure book with same title and year and author doesnt already exist
     let book = await db.get(
         "SELECT * FROM books WHERE title = ? AND pub_year = ? AND author_id = ?",
@@ -168,12 +166,17 @@ app.post("/books", async (req, res: BookResponse) => {
     return res.status(201).json(book);
 });
 
+app.delete("/books", async (req, res: BookResponse) => {
+    return res
+        .status(405)
+        .json({ error: "Method not allowed. Id must be specified" });
+});
 app.delete("/books/:id", async (req, res: BookResponse) => {
     if (!req.params.id) {
         return res.status(400).json({ error: "Id is required" });
     }
     if (isNaN(Number(req.params.id))) {
-        return res.status(400).json({ error: "Invalid book id" });
+        return res.status(400).json({ error: "Invalid id" });
     }
 
     let book = await db.get("SELECT * FROM books WHERE id = ?", [
@@ -199,12 +202,8 @@ app.get("/authors", async (req, res: AuthorResponse) => {
             authors = await db.all("SELECT * FROM authors WHERE name = ?", [
                 req.query.name,
             ]);
-        } else if (req.query.id) {
-            authors = await db.all("SELECT * FROM authors WHERE id = ?", [
-                req.query.id,
-            ]);
         } else {
-            authors = await db.all("SELECT * FROM authors");
+            return res.status(400).json({ error: "Invalid query param" });
         }
     }
 
@@ -215,10 +214,27 @@ app.get("/authors", async (req, res: AuthorResponse) => {
     }
 });
 
+app.get("/authors/:id", async (req, res: AuthorResponse) => {
+    if (isNaN(Number(req.params.id))) {
+        return res.status(400).json({ error: "Invalid author id" });
+    }
+    let author = await db.get("SELECT * FROM authors WHERE id = ?", [
+        req.params.id,
+    ]);
+    if (!author) {
+        return res.status(404).json({ error: "Author not found" });
+    } else {
+        return res.json(author);
+    }
+});
+
 app.post("/authors", async (req, res: AuthorResponse) => {
     //make sure all fields are present
-    if (!req.body.name || !req.body.bio) {
-        return res.status(400).json({ error: "Missing fields" });
+    if (!req.body.name) {
+        return res.status(400).json({ error: "Missing name" });
+    }
+    if (!req.body.bio) {
+        return res.status(400).json({ error: "Missing bio" });
     }
     //make sure author doesn't already exist
     let author = await db.get("SELECT * FROM authors WHERE name = ?", [
@@ -241,52 +257,35 @@ app.post("/authors", async (req, res: AuthorResponse) => {
     return res.status(201).json(author);
 });
 
-app.delete("/authors", async (req, res: AuthorResponse) => {
-    if (!req.query.id) {
-        return res.status(400).json({ error: "Id is required" });
+app.delete("/authors", async (req, res: BookResponse) => {
+    return res
+        .status(405)
+        .json({ error: "Method not allowed. Id must be specified" });
+});
+
+app.delete("/authors/:id", async (req, res: BookResponse) => {
+    if (isNaN(Number(req.params.id))) {
+        return res.status(400).json({ error: "Invalid id" });
     }
+
     let author = await db.get("SELECT * FROM authors WHERE id = ?", [
-        req.query.id,
+        req.params.id,
     ]);
     if (!author) {
-        return res.status(400).json({ error: "Author does not exist" });
+        return res.status(404).json({ error: "Author not found" });
     }
     //check if author has any books
     let books = await db.all("SELECT * FROM books WHERE author_id = ?", [
         req.query.id,
     ]);
     if (books.length > 0) {
-        return res.status(400).json({ error: "Cannot delete, author has books" });
+        return res
+            .status(400)
+            .json({ error: "Cannot delete, author has books" });
     }
-    await db.run("DELETE FROM authors WHERE id = ?", [req.query.id]);
+    await db.run("DELETE FROM books WHERE id = ?", [req.params.id]);
     return res.sendStatus(200);
 });
-
-// GET requests to fetch a single book / author by ID and all books / authors
-
-// Using query strings with GET requests to filter along at least one book or
-// author property, eg searching for all books published on or aftera  certain year
-
-//
-// ASYNC/AWAIT EXAMPLE
-//
-
-// function sleep(ms: number) {
-//     return new Promise((resolve) => setTimeout(resolve, ms));
-// }
-// // need async keyword on request handler to use await inside it
-// app.get("/bar", async (req, res: FooResponse) => {
-//     console.log("Waiting...");
-//     // await is equivalent to calling sleep.then(() => { ... })
-//     // and putting all the code after this in that func body ^
-//     await sleep(3000);
-//     // if we omitted the await, all of this code would execute
-//     // immediately without waiting for the sleep to finish
-//     console.log("Done!");
-//     return res.sendStatus(200);
-// });
-// test it out! while server is running:
-// curl http://localhost:3000/bar
 
 // run server
 let port = 3000;
