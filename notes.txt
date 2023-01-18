@@ -8,8 +8,14 @@ to them (as they’ll need the ID to perform future actions on that resource)?
 Any data accepted from a client needs to be validated to ensure it’s correct. What constraints should you
 enforce? Will you restrict genres to a certain subset of values?
 
-
+-->I will enforce the following constraints:
+-->-->Author id must point to an id in the author table
+-->-->Genre must be one of the following: "dystopian", "romance", "horror", "mystery", "fantasy", "sci-fi"
+-->-->Combination of title and author id and pub_year must be unique
 
 
 Books are associated with authors. Should you be able to create a book without a valid author ID? Should
 you be able to delete an author that still has books associated with them?
+-->As stated in the last question, any book added to the system must point to an author also in the system.
+-->I will not allow an author to be deleted if they have books associated with them. I will return an error
+    message to the user if they try to delete an author with books associated with them.
