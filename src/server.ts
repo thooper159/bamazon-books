@@ -1,9 +1,11 @@
 import express, { Response } from "express";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
+import path from "path";
 
 let app = express();
 app.use(express.json());
+app.use(express.static("public"));
 
 // create database "connection"
 let db = await open({
@@ -39,7 +41,9 @@ type BookResponse = Response<BookRow[] | Error>;
 
 type AuthorResponse = Response<AuthorRow[] | Error>;
 
-app.get("/books", async (req, res: BookResponse) => {
+app.use(express.static(path.resolve("./") + "/frontend"));
+
+app.get("/api/books", async (req, res: BookResponse) => {
     let numParams = Object.keys(req.query).length;
     let books: BookRow[];
     let params = [];
@@ -80,7 +84,7 @@ app.get("/books", async (req, res: BookResponse) => {
     }
 });
 
-app.get("/books/:id", async (req, res: BookResponse) => {
+app.get("/api/books/:id", async (req, res: BookResponse) => {
     //validate id is a number
     if (isNaN(Number(req.params.id))) {
         return res.status(400).json({ error: "Invalid book id" });
@@ -95,7 +99,7 @@ app.get("/books/:id", async (req, res: BookResponse) => {
     }
 });
 
-app.post("/books", async (req, res: BookResponse) => {
+app.post("/api/books", async (req, res: BookResponse) => {
     //make sure req body is type Book
     //make sure req body matches Book type
 
@@ -168,12 +172,12 @@ app.post("/books", async (req, res: BookResponse) => {
     return res.status(201).json(book);
 });
 
-app.delete("/books", async (req, res: BookResponse) => {
+app.delete("/api/books", async (req, res: BookResponse) => {
     return res
         .status(405)
         .json({ error: "Method not allowed. Id must be specified" });
 });
-app.delete("/books/:id", async (req, res: BookResponse) => {
+app.delete("/api/books/:id", async (req, res: BookResponse) => {
     if (!req.params.id) {
         return res.status(400).json({ error: "Id is required" });
     }
@@ -191,7 +195,7 @@ app.delete("/books/:id", async (req, res: BookResponse) => {
     return res.sendStatus(200);
 });
 
-app.get("/authors", async (req, res: AuthorResponse) => {
+app.get("/api/authors", async (req, res: AuthorResponse) => {
     let authors: AuthorRow[];
     let numParams = Object.keys(req.query).length;
 
@@ -216,7 +220,7 @@ app.get("/authors", async (req, res: AuthorResponse) => {
     }
 });
 
-app.get("/authors/:id", async (req, res: AuthorResponse) => {
+app.get("/api/authors/:id", async (req, res: AuthorResponse) => {
     if (isNaN(Number(req.params.id))) {
         return res.status(400).json({ error: "Invalid author id" });
     }
@@ -230,7 +234,7 @@ app.get("/authors/:id", async (req, res: AuthorResponse) => {
     }
 });
 
-app.post("/authors", async (req, res: AuthorResponse) => {
+app.post("/api/authors", async (req, res: AuthorResponse) => {
     //make sure all fields are present
     if (!req.body.name) {
         return res.status(400).json({ error: "Missing name" });
@@ -259,13 +263,13 @@ app.post("/authors", async (req, res: AuthorResponse) => {
     return res.status(201).json(author);
 });
 
-app.delete("/authors", async (req, res: BookResponse) => {
+app.delete("/api/authors", async (req, res: BookResponse) => {
     return res
         .status(405)
         .json({ error: "Method not allowed. Id must be specified" });
 });
 
-app.delete("/authors/:id", async (req, res: BookResponse) => {
+app.delete("/api/authors/:id", async (req, res: BookResponse) => {
     if (isNaN(Number(req.params.id))) {
         return res.status(400).json({ error: "Invalid id" });
     }
@@ -287,6 +291,10 @@ app.delete("/authors/:id", async (req, res: BookResponse) => {
     }
     await db.run("DELETE FROM books WHERE id = ?", [req.params.id]);
     return res.sendStatus(200);
+});
+
+app.get("*", (req, res): void => {
+    res.sendFile(path.resolve("./") + "/frontend/index.html");
 });
 
 // run server
