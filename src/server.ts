@@ -41,8 +41,6 @@ type BookResponse = Response<BookRow[] | Error>;
 
 type AuthorResponse = Response<AuthorRow[] | Error>;
 
-app.use(express.static(path.resolve("./") + "/frontend"));
-
 app.get("/api/books", async (req, res: BookResponse) => {
     let numParams = Object.keys(req.query).length;
     let books: BookRow[];
@@ -293,9 +291,9 @@ app.delete("/api/authors/:id", async (req, res: BookResponse) => {
     return res.sendStatus(200);
 });
 
-app.get("*", (req, res): void => {
-    res.sendFile(path.resolve("./") + "/frontend/index.html");
-});
+// app.get("*", (req, res): void => {
+//     res.sendFile(path.resolve("./") + "/public/index.html");
+// });
 
 // run server
 let port = 3000;
