@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
-import { AuthorRes, BookRes, Book } from "../../types";
+import { AuthorRes, BookRes } from "../../types";
+import { Table} from "./table";
 
 const fetchData = async (request: Request) => {
     const response = (await fetch(request)) as Response;
     return await response.json();
-};
-
-const getAuthorName = (id: string, authors: AuthorRes[]) => {
-    const author = authors.find((author) => author.id === id);
-    return author ? author.name : "Unknown";
 };
 
 export function BookList(): JSX.Element {
@@ -50,31 +46,7 @@ export function BookList(): JSX.Element {
     } else {
         return (
             <div>
-                {/* Table of books sorted alphabetically */}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>id</th>
-                            <th>Author (id)</th>
-                            <th>Year</th>
-                            <th>Genre</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {books
-                            .sort((a, b) => a.title.localeCompare(b.title))
-                            .map((book) => (
-                                <tr key={book.id}>
-                                    <td>{book.title}</td>
-                                    <td>{book.id}</td>
-                                    <td>{getAuthorName(book.author_id, authors)} ({book.author_id})</td>
-                                    <td>{book.pub_year}</td>
-                                    <td>{book.genre}</td>
-                                </tr>
-                            ))}
-                    </tbody>
-                </table>    
+                <Table books={books} authors={authors}  />
             </div>
         );
     }
