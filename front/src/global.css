@@ -22,6 +22,7 @@ td, thead {
 table {
     border-collapse: collapse;
     margin: 0 auto;
+    width: 50%;
 }
 
 tbody tr:nth-child(odd) {

@@ -12,6 +12,11 @@ const getAuthorName = (id: string, authors: AuthorRes[]) => {
 };
 
 export const Table: React.FC<TableProps> = (props: TableProps) => {
+    let books = props.books;
+    let authors = props.authors;
+    if (!Array.isArray(books)) {
+        books = [books];
+    }
     return (
         <table>
             <thead>
@@ -24,14 +29,14 @@ export const Table: React.FC<TableProps> = (props: TableProps) => {
                 </tr>
             </thead>
             <tbody>
-                {props.books
+                {books
                     .sort((a, b) => a.title.localeCompare(b.title))
                     .map((book) => (
                         <tr key={book.id}>
                             <td>{book.title}</td>
                             <td>{book.id}</td>
                             <td>
-                                {getAuthorName(book.author_id, props.authors)} (
+                                {getAuthorName(book.author_id, authors)} (
                                 {book.author_id})
                             </td>
                             <td>{book.pub_year}</td>
