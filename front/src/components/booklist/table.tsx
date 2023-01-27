@@ -33,14 +33,14 @@ export const Table: React.FC<TableProps> = (props: TableProps) => {
                     .sort((a, b) => a.title.localeCompare(b.title))
                     .map((book) => (
                         <tr key={book.id}>
-                            <td>{book.title}</td>
-                            <td>{book.id}</td>
-                            <td>
+                            <td width={"35%"}>{book.title}</td>
+                            <td width={"5%"}>{book.id}</td>
+                            <td width={"25%"}>
                                 {getAuthorName(book.author_id, authors)} (
                                 {book.author_id})
                             </td>
-                            <td>{book.pub_year}</td>
-                            <td>{book.genre}</td>
+                            <td width={"10%"}>{book.pub_year}</td>
+                            <td width={"25%"}>{book.genre}</td>
                         </tr>
                     ))}
             </tbody>

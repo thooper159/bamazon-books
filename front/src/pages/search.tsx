@@ -69,7 +69,7 @@ function Search() {
         //https://stackoverflow.com/questions/62989310/how-to-remove-empty-query-params-using-urlsearchparams
         let keysForDel: string[] = [];
         params.forEach((value, key) => {
-        if (value == '') {
+        if (value === '') {
             keysForDel.push(key);
         }
         });
@@ -119,49 +119,79 @@ function Search() {
     }
 
     return (
-        <div>
-            <h3>Search for books by title, author_id, year, and/or genre.</h3>
-            <div id="search-box">
+        <div className="row">
+            <br />
+            <div id="search-box" className="column">
+            <b>Search for books by title, author_id, year, and/or genre.</b>
                 <form onChange={handleInputChange} onSubmit={handleSubmit}>
-                    <label>
-                        Title:
-                        <input type="text" name="title" />
-                    </label>
-                    <br></br>
-                    <label>
-                        Author (id):
-                        <input type="text" name="author_id" />
-                    </label>
-                    <br></br>
-                    <label>
-                        Year:
-                        <input type="text" name="pub_year" />
-                    </label>
-                    <br></br>
-                    <label>
-                        Genre
-                        <select name="genre">
-                            <option value="">-</option>
-                            <option value="dystopian">Dystopian</option>
-                            <option value="romance">Romance</option>
-                            <option value="fantasy">Fantasy</option>
-                            <option value="horror">Horror</option>
-                            <option value="mystery">Mystery</option>
-                            <option value="sci-fi">Sci-Fi</option>
-                        </select>
-                    </label>
-                    <input type="submit" id="submit-query" value="Submit" />
-                </form>
-                <strong>
+                    <table>
+                        <tr>
+                            <td width={"30%"}>
+                            <label>
+                            Title:
+                            </label>
+                            </td>
+                            <td width={"70%"}>
+                            <input type="text" name="title" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            <label>
+                            Author (id):
+                            </label>
+                            </td>
+                            <td>
+                            <input type="text" name="author_id" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            <label>
+                            Year:
+                            </label>
+                            </td>
+                            <td>
+                            <input type="text" name="pub_year" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            <label>
+                            Genre:
+                            </label>
+                            </td>
+                            <td>
+                            <select name="genre">
+                                <option value="">-</option>
+                                <option value="dystopian">Dystopian</option>
+                                <option value="romance">Romance</option>
+                                <option value="fantasy">Fantasy</option>
+                                <option value="horror">Horror</option>
+                                <option value="mystery">Mystery</option>
+                                <option value="sci-fi">Sci-Fi</option>
+                            </select>
+                            </td>
+                        </tr>
+                        <tr>
+                                <td colSpan={2}>
+                                <strong>
                     <span id="query-preview"></span>
                 </strong>
-                <br />
-                <br />
-                <span id="query"></span>
-            </div>
-            <p>or</p>
-            <h3>Search for books by title, author, year, or genre.</h3>
-            <div id="search-box">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan={2}>
+                                <button style={{width: "100%", height:40}} type="submit">Search</button>
+                                </td>
+                            </tr>
+                    </table>
+                    <br />
+                </form>
+                <b> -- or --</b>
+                <br /><br />
+                <b>Search for book by id</b>
+                <div id="search-box">
                 <form onChange={handleInputChange} onSubmit={handleSubmitId}>
                     <label>
                         ID:
@@ -170,12 +200,16 @@ function Search() {
                     <input type="submit" id="submit-id" value="Submit" />
                 </form>
             </div>
+            </div>
+            
             <br />
             <br />
-            <div id="search-results">
+            <div id="search-results" className="column">
+                <br />
                 <SearchResults query={query} />
             </div>
         </div>
+        
     );
 }
 

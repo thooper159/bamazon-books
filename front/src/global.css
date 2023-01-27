@@ -22,7 +22,7 @@ td, thead {
 table {
     border-collapse: collapse;
     margin: 0 auto;
-    width: 50%;
+    width: 90%;
 }
 
 tbody tr:nth-child(odd) {
@@ -40,3 +40,11 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
         monospace;
 }
+
+.row {
+    display: flex;
+  }
+  
+  .column {
+    flex: 50%;
+  }

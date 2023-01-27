@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AuthorRes, BookRes } from "../../types";
+import { AuthorTable } from "./authors";
 import { Table} from "./table";
 
 const fetchData = async (request: Request) => {
@@ -46,7 +47,10 @@ export function BookList(): JSX.Element {
     } else {
         return (
             <div>
+                <h2>Books</h2>
                 <Table books={books} authors={authors}  />
+                <h2>Authors</h2>
+                <AuthorTable authors={authors} />
             </div>
         );
     }
