@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AuthorRes, BookRes } from "../../types";
-import { Table } from "../booklist/table";
+import { BookTable } from "../library/BookTable";
 
 export interface SearchResultsProps {
     query: string;
@@ -57,7 +57,7 @@ export function SearchResults(props: SearchResultsProps): JSX.Element {
     } else {
         return (
             <div>
-                <Table books={books} authors={authors}  />
+                <BookTable books={books} authors={authors} />
             </div>
         );
     }

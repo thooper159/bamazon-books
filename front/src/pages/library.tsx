@@ -1,10 +1,11 @@
-import { BookList } from "../components/booklist";
+import { LibraryTables } from "../components/library";
 
 function Library(): JSX.Element {
     return (
         <div>
             <h1>Library</h1>
-            <BookList />
+            <LibraryTables />
+            <br />
         </div>
     );
 }

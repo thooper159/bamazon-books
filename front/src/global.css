@@ -13,7 +13,8 @@ b {
     margin-left: 20%;
 }
 
-td, thead {
+td,
+thead {
     text-align: center;
     padding: 1rem;
     border: 1px solid #ccc;
@@ -43,8 +44,12 @@ code {
 
 .row {
     display: flex;
-  }
-  
-  .column {
+}
+
+.column {
     flex: 50%;
-  }
+}
+
+textarea {
+    resize: none;
+}

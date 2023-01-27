@@ -1,5 +1,5 @@
 import React from "react";
-import { Table } from "../components/booklist/table";
+import { Link } from "react-router-dom";
 import { SearchResults } from "../components/search-results";
 import { AuthorRes, BookRes } from "../types";
 
@@ -28,7 +28,7 @@ function Search() {
             setTitle(value);
         } else if (name === "author_id") {
             //validate input
-            if(isNaN(value)){
+            if (isNaN(value)) {
                 invalidateInput("author_id");
                 setAuthor("");
             } else {
@@ -36,7 +36,7 @@ function Search() {
                 setAuthor(value);
             }
         } else if (name === "pub_year") {
-            if(isNaN(value) || value.length > 4){
+            if (isNaN(value) || value.length > 4) {
                 invalidateInput("pub_year");
                 setYear("");
             } else {
@@ -46,7 +46,7 @@ function Search() {
         } else if (name === "genre") {
             setGenre(value);
         } else if (name === "id") {
-            if(isNaN(value)){
+            if (isNaN(value)) {
                 invalidateInput("id");
                 setId("");
             } else {
@@ -69,15 +69,15 @@ function Search() {
         //https://stackoverflow.com/questions/62989310/how-to-remove-empty-query-params-using-urlsearchparams
         let keysForDel: string[] = [];
         params.forEach((value, key) => {
-        if (value === '') {
-            keysForDel.push(key);
-        }
+            if (value === "") {
+                keysForDel.push(key);
+            }
         });
 
-        keysForDel.forEach(key => {
+        keysForDel.forEach((key) => {
             params.delete(key);
         });
-        if(params.toString() === ""){
+        if (params.toString() === "") {
             setQuery("http://localhost:3000/api/books");
         } else {
             const queryBuilder = `http://localhost:3000/api/books?${params.toString()}`;
@@ -94,10 +94,11 @@ function Search() {
     }
 
     function validateInput(input: string): void {
-        document.getElementsByName(input)[0]!.style.backgroundColor = ""; 
+        document.getElementsByName(input)[0]!.style.backgroundColor = "";
     }
     function invalidateInput(input: string): void {
-        document.getElementsByName(input)[0]!.style.backgroundColor = "lightcoral"; 
+        document.getElementsByName(input)[0]!.style.backgroundColor =
+            "lightcoral";
     }
 
     function getCurrentQuery(): void {
@@ -122,86 +123,96 @@ function Search() {
         <div className="row">
             <br />
             <div id="search-box" className="column">
-            <b>Search for books by title, author_id, year, and/or genre.</b>
+                <b>Search for books by title, author_id, year, and/or genre.</b>
                 <form onChange={handleInputChange} onSubmit={handleSubmit}>
                     <table>
-                        <tr>
-                            <td width={"30%"}>
-                            <label>
-                            Title:
-                            </label>
-                            </td>
-                            <td width={"70%"}>
-                            <input type="text" name="title" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                            <label>
-                            Author (id):
-                            </label>
-                            </td>
-                            <td>
-                            <input type="text" name="author_id" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                            <label>
-                            Year:
-                            </label>
-                            </td>
-                            <td>
-                            <input type="text" name="pub_year" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                            <label>
-                            Genre:
-                            </label>
-                            </td>
-                            <td>
-                            <select name="genre">
-                                <option value="">-</option>
-                                <option value="dystopian">Dystopian</option>
-                                <option value="romance">Romance</option>
-                                <option value="fantasy">Fantasy</option>
-                                <option value="horror">Horror</option>
-                                <option value="mystery">Mystery</option>
-                                <option value="sci-fi">Sci-Fi</option>
-                            </select>
-                            </td>
-                        </tr>
-                        <tr>
-                                <td colSpan={2}>
-                                <strong>
-                    <span id="query-preview"></span>
-                </strong>
+                        <tbody>
+                            <tr>
+                                <td width={"30%"}>
+                                    <label>Title</label>
+                                </td>
+                                <td width={"70%"}>
+                                    <input type="text" name="title" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>
+                                        Author (id){" "}
+                                        <Link to={"/library#props.authors"}>
+                                            (Reference)
+                                        </Link>
+                                    </label>
+                                </td>
+                                <td>
+                                    <input type="text" name="author_id" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Year</label>
+                                </td>
+                                <td>
+                                    <input type="text" name="pub_year" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Genre</label>
+                                </td>
+                                <td>
+                                    <select name="genre">
+                                        <option value="">-</option>
+                                        <option value="dystopian">
+                                            Dystopian
+                                        </option>
+                                        <option value="romance">Romance</option>
+                                        <option value="fantasy">Fantasy</option>
+                                        <option value="horror">Horror</option>
+                                        <option value="mystery">Mystery</option>
+                                        <option value="sci-fi">Sci-Fi</option>
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
                                 <td colSpan={2}>
-                                <button style={{width: "100%", height:40}} type="submit">Search</button>
+                                    <strong>
+                                        <span id="query-preview"></span>
+                                    </strong>
                                 </td>
                             </tr>
+                            <tr>
+                                <td colSpan={2}>
+                                    <button
+                                        style={{ width: "100%", height: 40 }}
+                                        type="submit"
+                                    >
+                                        Search
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                     <br />
                 </form>
                 <b> -- or --</b>
-                <br /><br />
+                <br />
+                <br />
                 <b>Search for book by id</b>
                 <div id="search-box">
-                <form onChange={handleInputChange} onSubmit={handleSubmitId}>
-                    <label>
-                        ID:
-                        <input type="text" name="id" />
-                    </label>
-                    <input type="submit" id="submit-id" value="Submit" />
-                </form>
+                    <form
+                        onChange={handleInputChange}
+                        onSubmit={handleSubmitId}
+                    >
+                        <label>
+                            ID:
+                            <input type="text" name="id" />
+                        </label>
+                        <input type="submit" id="submit-id" value="Submit" />
+                    </form>
+                </div>
             </div>
-            </div>
-            
+
             <br />
             <br />
             <div id="search-results" className="column">
@@ -209,7 +220,6 @@ function Search() {
                 <SearchResults query={query} />
             </div>
         </div>
-        
     );
 }
 

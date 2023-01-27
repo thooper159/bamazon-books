@@ -11,7 +11,7 @@ const getAuthorName = (id: string, authors: AuthorRes[]) => {
     return author ? author.name : "Unknown";
 };
 
-export const Table: React.FC<TableProps> = (props: TableProps) => {
+export const BookTable: React.FC<TableProps> = (props: TableProps) => {
     let books = props.books;
     let authors = props.authors;
     if (!Array.isArray(books)) {

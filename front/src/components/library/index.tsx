@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { AuthorRes, BookRes } from "../../types";
-import { AuthorTable } from "./authors";
-import { Table} from "./table";
+import { AuthorTable } from "./AuthorTable";
+import { BookTable } from "./BookTable";
 
 const fetchData = async (request: Request) => {
     const response = (await fetch(request)) as Response;
     return await response.json();
 };
 
-export function BookList(): JSX.Element {
+export function LibraryTables(): JSX.Element {
     const [error, setError] = useState<Error | null>(null);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [books, setBooks] = useState<BookRes[]>([]);
@@ -48,8 +48,8 @@ export function BookList(): JSX.Element {
         return (
             <div>
                 <h2>Books</h2>
-                <Table books={books} authors={authors}  />
-                <h2>Authors</h2>
+                <BookTable books={books} authors={authors} />
+                <h2 id="Authors">Authors</h2>
                 <AuthorTable authors={authors} />
             </div>
         );
