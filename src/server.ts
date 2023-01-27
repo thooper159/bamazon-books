@@ -341,10 +341,6 @@ app.delete("/api/authors/:id", async (req, res: BookResponse) => {
     return res.sendStatus(200);
 });
 
-// app.get("*", (req, res): void => {
-//     res.sendFile(path.resolve("./") + "/public/index.html");
-// });
-
 // run server
 let port = 3000;
 let host = "localhost";

@@ -1,6 +1,5 @@
 import { AuthorRes, BookRes } from "../../types";
 
-
 interface TableProps {
     books: BookRes[];
     authors: AuthorRes[];

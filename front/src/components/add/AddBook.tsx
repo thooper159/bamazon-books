@@ -7,11 +7,10 @@ interface AddBookProps {
 }
 
 export const AddBook = (props: AddBookProps) => {
-        const [title, setTitle] = React.useState<string>("");
+    const [title, setTitle] = React.useState<string>("");
     const [author_id, setAuthor] = React.useState<string>("");
     const [pub_year, setYear] = React.useState<string>("");
     const [genre, setGenre] = React.useState<string>("");
-
 
     function validateInput(input: string): void {
         document.getElementsByName(input)[0]!.style.backgroundColor = "";
@@ -22,9 +21,6 @@ export const AddBook = (props: AddBookProps) => {
     }
     async function handleSubmitBook(event: React.SyntheticEvent) {
         event.preventDefault();
-        //make sure all fields non-empty
-        console.log(title, author_id, pub_year, genre);
-
         if (!(title && author_id && pub_year && genre)) {
             alert("Please fill out all fields");
             return;
@@ -51,7 +47,9 @@ export const AddBook = (props: AddBookProps) => {
             alert("Book added successfully");
         } else {
             response.json().then((data) => {
-                alert("Error adding book:\n" + response.status + "\t" + data.error);
+                alert(
+                    "Error adding book:\n" + response.status + "\t" + data.error
+                );
             });
         }
     }
@@ -81,7 +79,6 @@ export const AddBook = (props: AddBookProps) => {
                 validateInput("author_id");
                 setAuthor(value);
             } else {
-                console.log(props.authors.length);
                 invalidateInput("author_id");
                 setAuthor("");
             }

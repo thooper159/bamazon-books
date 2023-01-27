@@ -9,7 +9,6 @@ const fetchData = async (request: Request) => {
 };
 
 function Add() {
-
     //get authors to see if author id is valid
     const [authors, setAuthors] = React.useState<AuthorRes[]>([]);
     const [error, setError] = React.useState<Error | null>(null);
@@ -29,7 +28,7 @@ function Add() {
         <div className="row">
             <div className="column">
                 <h1>Add a book</h1>
-                <AddBook authors={authors}/>
+                <AddBook authors={authors} />
             </div>
             <div className="column">
                 <h1>Add an author</h1>

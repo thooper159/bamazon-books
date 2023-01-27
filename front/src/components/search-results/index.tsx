@@ -24,14 +24,12 @@ export function SearchResults(props: SearchResultsProps): JSX.Element {
                 setAuthors(result);
             })
             .catch((error) => {
-                console.log(error);
                 setError(error);
             });
     }, []);
 
     useEffect(() => {
         setError(null);
-        console.log(props.query)
         const request = new Request(props.query);
         fetchData(request)
             .then((result) => {
@@ -39,21 +37,17 @@ export function SearchResults(props: SearchResultsProps): JSX.Element {
                 setBooks(result);
             })
             .catch((error) => {
-                console.log(error);
                 setIsLoaded(true);
                 setError(error);
             });
     }, [props.query]);
 
-    if(props.query === "") {
+    if (props.query === "") {
         return <div></div>;
-    }
-    else if(error) {
-        return <div>Error: {error.message}
-        </div>;
+    } else if (error) {
+        return <div>Error: {error.message}</div>;
     } else if (!isLoaded) {
-        return <div>Loading...
-        </div>;
+        return <div>Loading...</div>;
     } else {
         return (
             <div>

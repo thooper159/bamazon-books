@@ -1,10 +1,8 @@
 import { AuthorRes, BookRes } from "../../types";
 
-
 interface TableProps {
     authors: AuthorRes[];
 }
-
 
 export const AuthorTable: React.FC<TableProps> = (props: TableProps) => {
     let authors = props.authors;
@@ -18,14 +16,13 @@ export const AuthorTable: React.FC<TableProps> = (props: TableProps) => {
                 </tr>
             </thead>
             <tbody>
-                {authors
-                    .map((author) => (
-                        <tr key={author.id}>
-                            <td width={"5%"}>{author.id}</td>
-                            <td width={"25%"}>{author.name}</td>
-                            <td width={"70%"}>{author.bio}</td>
-                        </tr>
-                    ))}
+                {authors.map((author) => (
+                    <tr key={author.id}>
+                        <td width={"5%"}>{author.id}</td>
+                        <td width={"25%"}>{author.name}</td>
+                        <td width={"70%"}>{author.bio}</td>
+                    </tr>
+                ))}
             </tbody>
         </table>
     );

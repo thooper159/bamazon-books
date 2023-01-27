@@ -5,7 +5,6 @@ export const AddAuthor = () => {
     const [name, setName] = React.useState<string>("");
     const [bio, setBio] = React.useState<string>("");
 
-    
     async function handleSubmitAuthor(event: React.SyntheticEvent) {
         event.preventDefault();
         //make sure all fields non-empty
@@ -20,7 +19,7 @@ export const AddAuthor = () => {
             },
             body: JSON.stringify({
                 name,
-                bio
+                bio,
             }),
         });
         const response = (await fetch(request)) as Response;
@@ -32,13 +31,18 @@ export const AddAuthor = () => {
         } else {
             response.json().then((data) => {
                 alert(
-                    "Error adding book:\n" + response.status + "\t" + data.error
+                    "Error adding author:\n" +
+                        response.status +
+                        "\t" +
+                        data.error
                 );
             });
         }
     }
 
-    function handleInputChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    function handleInputChange(
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) {
         const target = event.target;
         const value = target.value;
         const name = target.name;

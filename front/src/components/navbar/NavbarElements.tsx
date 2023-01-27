@@ -1,5 +1,5 @@
-import {NavLink as Link} from 'react-router-dom';
-import styled from 'styled-components';
+import { NavLink as Link } from "react-router-dom";
+import styled from "styled-components";
 //CSS and structure based on:
 //www.geeksforgeeks.org/how-to-create-a-multi-page-website-using-react-js/
 

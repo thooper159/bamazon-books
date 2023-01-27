@@ -81,7 +81,6 @@ function Search() {
             setQuery("http://localhost:3000/api/books");
         } else {
             const queryBuilder = `http://localhost:3000/api/books?${params.toString()}`;
-            console.log(queryBuilder);
             setQuery(queryBuilder);
         }
     }
@@ -89,7 +88,6 @@ function Search() {
     function handleSubmitId(event: React.SyntheticEvent): void {
         event.preventDefault();
         const queryBuilder = `http://localhost:3000/api/books/${id}`;
-        console.log(queryBuilder);
         setQuery(queryBuilder);
     }
 
