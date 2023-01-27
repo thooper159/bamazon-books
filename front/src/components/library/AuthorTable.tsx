@@ -16,13 +16,19 @@ export const AuthorTable: React.FC<TableProps> = (props: TableProps) => {
                 </tr>
             </thead>
             <tbody>
-                {authors.map((author) => (
-                    <tr key={author.id}>
-                        <td width={"5%"}>{author.id}</td>
-                        <td width={"25%"}>{author.name}</td>
-                        <td width={"70%"}>{author.bio}</td>
+                {authors.length === 0 ? (
+                    <tr>
+                        <td colSpan={3}>No authors found</td>
                     </tr>
-                ))}
+                ) : (
+                    authors.map((author) => (
+                        <tr key={author.id}>
+                            <td width={"5%"}>{author.id}</td>
+                            <td width={"25%"}>{author.name}</td>
+                            <td width={"70%"}>{author.bio}</td>
+                        </tr>
+                    ))
+                )}
             </tbody>
         </table>
     );
