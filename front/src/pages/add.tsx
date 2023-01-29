@@ -12,8 +12,9 @@ function Add() {
     //get authors to see if author id is valid
     const [authors, setAuthors] = React.useState<AuthorRes[]>([]);
     const [error, setError] = React.useState<Error | null>(null);
+    const [updated, setUpdated] = React.useState<boolean>(false);
 
-    React.useEffect(() => {
+      React.useEffect(() => {
         const request = new Request("http://localhost:3000/api/authors");
         fetchData(request)
             .then((result) => {
@@ -22,7 +23,7 @@ function Add() {
             .catch((error) => {
                 setError(error);
             });
-    }, []);
+    }, [updated]);
 
     return (
         <div className="row">
@@ -32,7 +33,7 @@ function Add() {
             </div>
             <div className="column">
                 <h1>Add an author</h1>
-                <AddAuthor />
+                <AddAuthor setUpdated={setUpdated} />
             </div>
         </div>
     );

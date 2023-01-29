@@ -1,7 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export const AddAuthor = () => {
+interface AddAuthorProps {
+    setUpdated: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const AddAuthor = (props: AddAuthorProps) => {
     const [name, setName] = React.useState<string>("");
     const [bio, setBio] = React.useState<string>("");
 
@@ -28,6 +32,7 @@ export const AddAuthor = () => {
             setName("");
             setBio("");
             alert("Author added successfully");
+            props.setUpdated(true);
         } else {
             response.json().then((data) => {
                 alert(
