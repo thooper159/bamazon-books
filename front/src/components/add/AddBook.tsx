@@ -75,7 +75,10 @@ export const AddBook = (props: AddBookProps) => {
             //validate input
             //check if value is an integer
 
-            if (!isNaN(+value) && Number(value) <= props.authors.length) {
+            if (
+                !isNaN(+value) &&
+                props.authors.some((a) => a.id.toString() === value)
+            ) {
                 validateInput("author_id");
                 setAuthor(value);
             } else {
