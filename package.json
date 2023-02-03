@@ -1,5 +1,5 @@
 {
-    "name": "bamazon-books",
+  "name": "bamazon-books",
   "scripts": {
     "setup": "rm -f database.db && sqlite3 database.db < setup.sql",
     "build": "rm -rf out && mkdir out && tsc",
