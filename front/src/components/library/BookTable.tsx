@@ -22,7 +22,7 @@ export const BookTable: React.FC<TableProps> = (props: TableProps) => {
                 <tr>
                     <th>Title</th>
                     <th>id</th>
-                    <th>Author (id)</th>
+                    <th>Author</th>
                     <th>Year</th>
                     <th>Genre</th>
                 </tr>
@@ -40,8 +40,7 @@ export const BookTable: React.FC<TableProps> = (props: TableProps) => {
                                 <td width={"35%"}>{book.title}</td>
                                 <td width={"5%"}>{book.id}</td>
                                 <td width={"25%"}>
-                                    {getAuthorName(book.author_id, authors)} (
-                                    {book.author_id})
+                                    {getAuthorName(book.author_id, authors)}
                                 </td>
                                 <td width={"10%"}>{book.pub_year}</td>
                                 <td width={"25%"}>{book.genre}</td>

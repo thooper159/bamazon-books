@@ -61,6 +61,8 @@ export const AddBook = (props: AddBookProps) => {
 
         if (name === "genre") {
             setGenre(value);
+        } else if (name === "author_id") {
+            setAuthor(value);
         }
     }
 
@@ -71,20 +73,6 @@ export const AddBook = (props: AddBookProps) => {
 
         if (name === "title") {
             setTitle(value);
-        } else if (name === "author_id") {
-            //validate input
-            //check if value is an integer
-
-            if (
-                !isNaN(+value) &&
-                props.authors.some((a) => a.id.toString() === value)
-            ) {
-                validateInput("author_id");
-                setAuthor(value);
-            } else {
-                invalidateInput("author_id");
-                setAuthor("");
-            }
         } else if (name === "pub_year") {
             if (isNaN(+value) || value.length > 4) {
                 invalidateInput("pub_year");
@@ -124,13 +112,18 @@ export const AddBook = (props: AddBookProps) => {
                             </label>
                         </td>
                         <td>
-                            <input
-                                type="text"
-                                id="author_id"
+                            <select 
                                 name="author_id"
+                                id="author_id"
                                 value={author_id}
-                                onChange={handleInputChange}
-                            />
+                                onChange={handleSelectChange}>
+                                <option value="">Select an author</option>
+                                {props.authors.map((a) => (
+                                    <option key={a.id} value={a.id}>
+                                        {a.name}
+                                    </option>
+                                ))}
+                            </select>
                         </td>
                     </tr>
                     <tr>

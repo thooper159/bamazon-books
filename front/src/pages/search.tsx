@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import { SearchResults } from "../components/search-results";
 import { AuthorRes, BookRes } from "../types";
 
+const fetchData = async (request: Request) => {
+    const response = (await fetch(request)) as Response;
+    return await response.json();
+};
+
 function Search() {
     const [title, setTitle] = React.useState<string>("");
     const [author_id, setAuthor] = React.useState<string>("");
@@ -10,10 +15,20 @@ function Search() {
     const [genre, setGenre] = React.useState<string>("");
     const [id, setId] = React.useState<string>("");
     const [query, setQuery] = React.useState<string>("");
-    const [books, setBooks] = React.useState<BookRes[]>([]);
     const [authors, setAuthors] = React.useState<AuthorRes[]>([]);
-    const [error, setError] = React.useState<Error | null>(null);
-    const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
+
+    
+    React.useEffect(() => {
+        const request = new Request("http://localhost:3000/api/authors");
+        fetchData(request)
+            .then((result) => {
+                setAuthors(result);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }, []);
+
 
     React.useEffect(() => {
         getCurrentQuery();
@@ -102,7 +117,7 @@ function Search() {
     function getCurrentQuery(): void {
         let queryPreview: string = "Get all books";
         if (author_id) {
-            queryPreview += ` by author_id ${author_id}`;
+            queryPreview += ` by ` + authors[parseInt(author_id) - 1].name;
         }
         if (title) {
             queryPreview += ` with title ${title}`;
@@ -136,14 +151,22 @@ function Search() {
                             <tr>
                                 <td>
                                     <label>
-                                        Author (id){" "}
-                                        <Link to={"/library#props.authors"}>
-                                            (Reference)
-                                        </Link>
+                                        Author
                                     </label>
                                 </td>
                                 <td>
-                                    <input type="text" name="author_id" />
+                                    {/* <input type="text" name="author_id" /> */}
+                                    <select name="author_id">
+                                        <option value="">-</option>
+                                        {authors.map((author) => (
+                                            <option
+                                                key={author.id}
+                                                value={author.id}
+                                            >
+                                                {author.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
@@ -215,7 +238,7 @@ function Search() {
             <br />
             <div id="search-results" className="column">
                 <br />
-                <SearchResults query={query} />
+                <SearchResults query={query} authors={authors} />
             </div>
         </div>
     );

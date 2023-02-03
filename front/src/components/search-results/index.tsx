@@ -4,29 +4,19 @@ import { BookTable } from "../library/BookTable";
 
 export interface SearchResultsProps {
     query: string;
+    authors: AuthorRes[];
 }
+const fetchData = async (request: Request) => {
+    const response = (await fetch(request)) as Response;
+    return await response.json();
+};
 
 export function SearchResults(props: SearchResultsProps): JSX.Element {
     const [error, setError] = useState<Error | null>(null);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [books, setBooks] = useState<BookRes[]>([]);
-    const [authors, setAuthors] = useState<AuthorRes[]>([]);
+    // const [authors, setAuthors] = useState<AuthorRes[]>([]);
 
-    const fetchData = async (request: Request) => {
-        const response = (await fetch(request)) as Response;
-        return await response.json();
-    };
-
-    useEffect(() => {
-        const request = new Request("http://localhost:3000/api/authors");
-        fetchData(request)
-            .then((result) => {
-                setAuthors(result);
-            })
-            .catch((error) => {
-                setError(error);
-            });
-    }, []);
 
     useEffect(() => {
         setError(null);
@@ -42,6 +32,19 @@ export function SearchResults(props: SearchResultsProps): JSX.Element {
             });
     }, [props.query]);
 
+    // useEffect(() => {
+    //     const request = new Request("http://localhost:3000/api/authors");
+    //     fetchData(request)
+    //         .then((result) => {
+    //             setIsLoaded(true);
+    //             setAuthors(result);
+    //         })
+    //         .catch((error) => {
+    //             setIsLoaded(true);
+    //             setError(error);
+    //         });
+    // }, []);
+
     if (props.query === "") {
         return <div></div>;
     } else if (error) {
@@ -51,7 +54,7 @@ export function SearchResults(props: SearchResultsProps): JSX.Element {
     } else {
         return (
             <div>
-                <BookTable books={books} authors={authors} />
+                <BookTable books={books} authors={props.authors} />
             </div>
         );
     }
