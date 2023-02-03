@@ -2,6 +2,7 @@
   "name": "bamazon-books",
   "scripts": {
     "setup": "rm -f database.db && sqlite3 database.db < setup.sql",
+    "test-data": "sqlite3 database.db < test_data.sql",
     "build": "rm -rf out && mkdir out && tsc",
     "build:deploy": "rm -rf out && mkdir out && tsc && (cd front && npm run build)",
     "start": "cd out && node server.js",
