@@ -538,6 +538,49 @@ describe("POST /books", () => {
     });
 });
 
+//PUT books
+describe("PUT /books/:id", () => {
+    beforeEach(async () => {
+        await db.exec("DELETE FROM books");
+        await db.exec("DELETE FROM authors");
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (1, 'Ray Bradbury', 'American author')"
+        );
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (2, 'J.R.R. Tolkien', 'English author')"
+        );
+        await db.exec(
+            "INSERT INTO authors(id, name, bio) VALUES (3, 'J.K. Rowling', 'English author')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (1, 1, 'Fahrenheit 451', '1953', 'dystopian')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (2, 2, 'The Hobbit', '1937', 'fantasy')"
+        );
+        await db.exec(
+            "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (3, 3, 'Harry Potter and the Sorcerer''s Stone', '1997', 'fantasy')"
+        );
+    });
+
+    test("Update title", async () => {
+        let { data } = await axios.put(`${baseUrl}/api/books/1`, {
+            author_id: 1,
+            title: "Fahrenheit 451: The temperature at which book paper catches fire and burns.",
+            pub_year: "1953",
+            genre: "dystopian",
+        });
+        expect(data).toEqual({
+            id: 1,
+            author_id: 1,
+            title: "Fahrenheit 451: The temperature at which book paper catches fire and burns.",
+            pub_year: "1953",
+            genre: "dystopian",
+        });
+    });
+});
+
+
 //DELETE books
 describe("DELETE /books/:id", () => {
     beforeEach(async () => {

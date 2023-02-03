@@ -3,6 +3,8 @@ import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import { fileURLToPath } from "url";
 import path from "path";
+import { Request } from "express-serve-static-core";
+import { ParsedQs } from "qs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,6 +47,14 @@ type Book = {
     pub_year: string;
     genre: Genres;
 };
+
+type BookPut = {
+    author_id?: string;
+    title?: string;
+    pub_year?: string;
+    genre?: Genres;
+};
+
 type BookRow = { id: string } & Book;
 
 type Author = {
@@ -75,7 +85,8 @@ app.get("/api/books", async (req, res: BookResponse) => {
     } else {
         query += " WHERE ";
         //iterate through query params if they are valid
-        for (let key in req.query) {
+        let key: string;
+        for (key in req.query) {
             if (
                 key === "author_id" ||
                 key === "pub_year" ||
@@ -116,31 +127,57 @@ app.get("/api/books/:id", async (req, res: Response<BookRow | Error>) => {
     }
 });
 
-app.post("/api/books", async (req, res: BookResponse) => {
-    //make sure req body is type Book
-    //make sure req body matches Book type
-
+//these types are atrocious, I know :( hopefully I can come back and make a better solution
+async function verifyBookData(
+    req:
+        | Request<{}, BookRow[] | Error, any, ParsedQs, Record<string, any>>
+        | Request<
+              { id: string },
+              Error | BookRow,
+              any,
+              ParsedQs,
+              Record<string, any>
+          >
+) {
     if (!req.body.author_id) {
-        return res.status(400).json({ error: "Missing author_id" });
+        return {
+            status: 400,
+            error: "Missing author_id",
+        };
     }
     if (!req.body.title) {
-        return res.status(400).json({ error: "Missing title" });
+        return {
+            status: 400,
+            error: "Missing title",
+        };
     }
     if (!req.body.pub_year) {
-        return res.status(400).json({ error: "Missing pub_year" });
+        return {
+            status: 400,
+            error: "Missing pub_year",
+        };
     }
     if (!req.body.genre) {
-        return res.status(400).json({ error: "Missing genre" });
+        return {
+            status: 400,
+            error: "Missing genre",
+        };
     }
 
     //make sure genre is valid
     if (!genres.includes(req.body.genre)) {
-        return res.status(400).json({ error: "Invalid genre" });
+        return {
+            status: 400,
+            error: "Invalid genre",
+        };
     }
 
     //make sure pub_year is a year (CE years only, BCE coming soon)
     if (isNaN(Number(req.body.pub_year))) {
-        return res.status(400).json({ error: "Invalid pub_year" });
+        return {
+            status: 400,
+            error: "Invalid pub_year",
+        };
     }
 
     //make sure book with same title and year and author doesnt already exist
@@ -150,7 +187,10 @@ app.post("/api/books", async (req, res: BookResponse) => {
     );
 
     if (book) {
-        return res.status(400).json({ error: "Book already exists" });
+        return {
+            status: 400,
+            error: "Book already exists",
+        };
     }
     //make sure author exists
     let author: AuthorRow | undefined = await db.get(
@@ -158,9 +198,22 @@ app.post("/api/books", async (req, res: BookResponse) => {
         [req.body.author_id]
     );
     if (!author) {
-        return res.status(400).json({ error: "Author does not exist" });
+        return {
+            status: 400,
+            error: "Author does not exist",
+        };
     }
+}
 
+app.post("/api/books", async (req, res: BookResponse) => {
+    //make sure req body matches Book type
+    if (!req.body) {
+        return res.status(400).json({ error: "Missing request body" });
+    }
+    let error = await verifyBookData(req);
+    if (error) {
+        return res.status(error.status).json({ error: error.error });
+    }
     //insert book
     let statement = await db.prepare(
         "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (?, ?, ?, ?, ?)"
@@ -177,8 +230,55 @@ app.post("/api/books", async (req, res: BookResponse) => {
     ]);
     await statement.run();
     //return book just created
-    book = await db.get("SELECT * FROM books WHERE id = ?", [id]);
+    let book = await db.get("SELECT * FROM books WHERE id = ?", [id]);
     return res.status(201).json(book);
+});
+app.put("/api/books", async (req, res: Response<Error>) => {
+    return res
+        .status(405)
+        .json({ error: "Method not allowed. Id must be specified" });
+});
+
+app.put("/api/books/:id", async (req, res: Response<BookRow | Error>) => {
+    //check if id is a number and points to a book
+    console.log("here");
+    if (isNaN(Number(req.params.id))) {
+        return res.status(400).json({ error: "Invalid book id" });
+    }
+    let currentBook: BookRow | undefined = await db.get(
+        "SELECT * FROM books WHERE id = ?",
+        [req.params.id]
+    );
+    if (!currentBook) {
+        return res.status(404).json({ error: "Book not found" });
+    }
+    if (!req.body) {
+        return res.status(400).json({ error: "Missing request body" });
+    }
+    let error = await verifyBookData(req);
+    if (error) {
+        return res.status(error.status).json({ error: error.error });
+    }
+
+    console.log("here");
+    //update book
+    let statement = await db.prepare(
+        "UPDATE books SET author_id = ?, title = ?, pub_year = ?, genre = ? WHERE id = ?"
+    );
+    await statement.bind([
+        req.body.author_id,
+        req.body.title,
+        req.body.pub_year,
+        req.body.genre,
+        req.params.id,
+    ]);
+    console.log(req.body);
+    await statement.run();
+    //return updated book
+    let newBook = await db.get("SELECT * FROM books WHERE id = ?", [
+        req.params.id,
+    ]);
+    return res.status(200).json(newBook);
 });
 
 app.delete("/api/books", async (req, res: BookResponse) => {
