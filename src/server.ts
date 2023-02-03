@@ -1,7 +1,7 @@
 import express, { Response } from "express";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "url";
 import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,17 +28,22 @@ let db = await open({
 });
 await db.get("PRAGMA foreign_keys = ON");
 
+let genres = [
+    "dystopian",
+    "romance",
+    "horror",
+    "mystery",
+    "fantasy",
+    "sci-fi",
+] as const;
+
+type Genres = typeof genres[number];
+
 type Book = {
     author_id: string;
     title: string;
     pub_year: string;
-    genre:
-        | "dystopian"
-        | "romance"
-        | "horror"
-        | "mystery"
-        | "fantasy"
-        | "sci-fi";
+    genre: Genres;
 };
 type BookRow = { id: string } & Book;
 
@@ -90,13 +95,13 @@ app.get("/api/books", async (req, res: BookResponse) => {
         books = await db.all(query, params);
     }
     if (!books) {
-        return res.status(204).json({ error: "No books found" });
+        return res.status(204);
     } else {
         return res.json(books);
     }
 });
 
-app.get("/api/books/:id", async (req, res: BookResponse) => {
+app.get("/api/books/:id", async (req, res: Response<BookRow | Error>) => {
     //validate id is a number
     if (isNaN(Number(req.params.id))) {
         return res.status(400).json({ error: "Invalid book id" });
@@ -129,16 +134,7 @@ app.post("/api/books", async (req, res: BookResponse) => {
     }
 
     //make sure genre is valid
-    if (
-        !(
-            req.body.genre === "dystopian" ||
-            req.body.genre === "romance" ||
-            req.body.genre === "horror" ||
-            req.body.genre === "mystery" ||
-            req.body.genre === "fantasy" ||
-            req.body.genre === "sci-fi"
-        )
-    ) {
+    if (!genres.includes(req.body.genre)) {
         return res.status(400).json({ error: "Invalid genre" });
     }
 
@@ -157,7 +153,7 @@ app.post("/api/books", async (req, res: BookResponse) => {
         return res.status(400).json({ error: "Book already exists" });
     }
     //make sure author exists
-    let author: AuthorRow[] | undefined = await db.get(
+    let author: AuthorRow | undefined = await db.get(
         "SELECT * FROM authors WHERE id = ?",
         [req.body.author_id]
     );
@@ -198,7 +194,7 @@ app.delete("/api/books/:id", async (req, res: BookResponse) => {
         return res.status(400).json({ error: "Invalid id" });
     }
 
-    let book: BookRow[] | undefined = await db.get(
+    let book: BookRow | undefined = await db.get(
         "SELECT * FROM books WHERE id = ?",
         [req.params.id]
     );
@@ -228,17 +224,17 @@ app.get("/api/authors", async (req, res: AuthorResponse) => {
     }
 
     if (!authors) {
-        return res.status(204).json({ error: "No authors found" });
+        return res.status(204);
     } else {
         return res.json(authors);
     }
 });
 
-app.get("/api/authors/:id", async (req, res: AuthorResponse) => {
+app.get("/api/authors/:id", async (req, res: Response<AuthorRow | Error>) => {
     if (isNaN(Number(req.params.id))) {
         return res.status(400).json({ error: "Invalid author id" });
     }
-    let author: AuthorRow[] | undefined = await db.get(
+    let author: AuthorRow | undefined = await db.get(
         "SELECT * FROM authors WHERE id = ?",
         [req.params.id]
     );
@@ -308,7 +304,6 @@ app.delete("/api/authors/:id", async (req, res: BookResponse) => {
     await db.run("DELETE FROM books WHERE id = ?", [req.params.id]);
     return res.sendStatus(200);
 });
-
 
 app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));

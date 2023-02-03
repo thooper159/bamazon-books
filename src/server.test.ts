@@ -139,42 +139,42 @@ describe("GET /books", () => {
         );
     });
     test("No argument returns all books", async () => {
-        let { data } = await axios.get(`${baseUrl}/books`);
+        let { data } = await axios.get(`${baseUrl}/api/books`);
         expect(data).toEqual(someBooks);
     });
 
     test("Query by author_id returns all books by that author", async () => {
-        let { data } = await axios.get(`${baseUrl}/books?author_id=3`);
+        let { data } = await axios.get(`${baseUrl}/api/books?author_id=3`);
         expect(data).toEqual([someBooks[2], someBooks[3]]);
     });
 
     test("Query by genre returns all books of that genre", async () => {
-        let { data } = await axios.get(`${baseUrl}/books?genre=fantasy`);
+        let { data } = await axios.get(`${baseUrl}/api/books?genre=fantasy`);
         expect(data).toEqual([someBooks[1], someBooks[2], someBooks[3]]);
     });
 
     test("Query by title returns all books with that title", async () => {
         let { data } = await axios.get(
-            `${baseUrl}/books?title=Harry Potter and the Sorcerer's Stone`
+            `${baseUrl}/api/books?title=Harry Potter and the Sorcerer's Stone`
         );
         expect(data).toEqual([someBooks[2]]);
     });
 
     test("Query by pub_year returns all books published in that year", async () => {
-        let { data } = await axios.get(`${baseUrl}/books?pub_year=1998`);
+        let { data } = await axios.get(`${baseUrl}/api/books?pub_year=1998`);
         expect(data).toEqual([someBooks[3]]);
     });
 
     test("Query with multiple args returns all books that match combo of args", async () => {
         let { data } = await axios.get(
-            `${baseUrl}/books?author_id=4&genre=mystery`
+            `${baseUrl}/api/books?author_id=4&genre=mystery`
         );
         expect(data).toEqual([someBooks[6]]);
     });
 
     test("Invalid query returns error", async () => {
         try {
-            await axios.get(`${baseUrl}/books?foo=bar`);
+            await axios.get(`${baseUrl}/api/books?foo=bar`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -188,9 +188,9 @@ describe("GET /books", () => {
         }
     });
 
-    test("Query with 1 parameter with no matches returns empty array", async () => {
+    test("Query with 1 parameter with no matches returns 204", async () => {
         try {
-            await axios.get(`${baseUrl}/books?author_id=5`);
+            await axios.get(`${baseUrl}/api/books?author_id=5`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -198,15 +198,12 @@ describe("GET /books", () => {
             }
             let { response } = errorObj;
             expect(response.status).toEqual(204);
-            expect(response.data).toEqual({
-                error: "No books found",
-            });
         }
     });
 
     test("Query with multiple parameters with no matches returns empty array", async () => {
         try {
-            await axios.get(`${baseUrl}/books?author_id=5&genre=mystery`);
+            await axios.get(`${baseUrl}/api/books?author_id=5&genre=mystery`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -221,7 +218,7 @@ describe("GET /books", () => {
     });
     test("Query with multiple parameters, one parameter is incorrect", async () => {
         try {
-            await axios.get(`${baseUrl}/books?author_id=5&foo=bar`);
+            await axios.get(`${baseUrl}/api/books?author_id=5&foo=bar`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -277,7 +274,7 @@ describe("GET /books/:id", () => {
     });
 
     test("Valid id returns book", async () => {
-        let { data } = await axios.get(`${baseUrl}/books/1`);
+        let { data } = await axios.get(`${baseUrl}/api/books/1`);
         expect(data).toEqual({
             id: 1,
             author_id: 1,
@@ -289,7 +286,7 @@ describe("GET /books/:id", () => {
 
     test("Nonexistant id returns error", async () => {
         try {
-            await axios.get(`${baseUrl}/books/8`);
+            await axios.get(`${baseUrl}/api/books/8`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -305,7 +302,7 @@ describe("GET /books/:id", () => {
 
     test("Invalid id type returns error", async () => {
         try {
-            await axios.get(`${baseUrl}/books/foo`);
+            await axios.get(`${baseUrl}/api/books/foo`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -337,7 +334,7 @@ describe("POST /books", () => {
     });
 
     test("Valid data returns new book", async () => {
-        let { data } = await axios.post(`${baseUrl}/books`, {
+        let { data } = await axios.post(`${baseUrl}/api/books`, {
             author_id: 1,
             title: "Fahrenheit 451",
             pub_year: "1953",
@@ -354,13 +351,13 @@ describe("POST /books", () => {
 
     test("Book already exists returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 author_id: 1,
                 title: "Fahrenheit 451",
                 pub_year: "1953",
                 genre: "dystopian",
             });
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 author_id: 1,
                 title: "Fahrenheit 451",
                 pub_year: "1953",
@@ -381,7 +378,7 @@ describe("POST /books", () => {
 
     test("Missing author_id returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 title: "Fahrenheit 451",
                 pub_year: "1953",
                 genre: "dystopian",
@@ -401,7 +398,7 @@ describe("POST /books", () => {
 
     test("Invalid author_id returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 author_id: 5,
                 title: "Fahrenheit 451",
                 pub_year: "1953",
@@ -422,7 +419,7 @@ describe("POST /books", () => {
 
     test("Missing title returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 author_id: 1,
                 pub_year: "1953",
                 genre: "dystopian",
@@ -442,7 +439,7 @@ describe("POST /books", () => {
 
     test("Missing pub_year returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 author_id: 1,
                 title: "Fahrenheit 451",
                 genre: "dystopian",
@@ -462,7 +459,7 @@ describe("POST /books", () => {
 
     test("Invalid pub_year returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 author_id: 1,
                 title: "Fahrenheit 451",
                 pub_year: "foo year",
@@ -483,7 +480,7 @@ describe("POST /books", () => {
 
     test("Missing genre returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 author_id: 1,
                 title: "Fahrenheit 451",
                 pub_year: "1953",
@@ -503,7 +500,7 @@ describe("POST /books", () => {
 
     test("Invalid genre returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/books`, {
+            await axios.post(`${baseUrl}/api/books`, {
                 author_id: 1,
                 title: "Fahrenheit 451",
                 pub_year: "1953",
@@ -524,13 +521,13 @@ describe("POST /books", () => {
 
     //ID is auto-incremented
     test("ID is auto-incremented", async () => {
-        let { data: data1 } = await axios.post(`${baseUrl}/books`, {
+        let { data: data1 } = await axios.post(`${baseUrl}/api/books`, {
             author_id: 1,
             title: "Fahrenheit 451",
             pub_year: "1953",
             genre: "dystopian",
         });
-        let { data: data2 } = await axios.post(`${baseUrl}/books`, {
+        let { data: data2 } = await axios.post(`${baseUrl}/api/books`, {
             author_id: 3,
             title: "Harry Potter and the Sorcerer's Stone",
             pub_year: "1997",
@@ -566,7 +563,7 @@ describe("DELETE /books/:id", () => {
     //Delete book returns 200 status
     test("Delete book", async () => {
         try {
-            await axios.delete(`${baseUrl}/books/1`);
+            await axios.delete(`${baseUrl}/api/books/1`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -580,7 +577,7 @@ describe("DELETE /books/:id", () => {
     //Missing id returns error
     test("Missing id returns error", async () => {
         try {
-            await axios.delete(`${baseUrl}/books`);
+            await axios.delete(`${baseUrl}/api/books`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -596,7 +593,7 @@ describe("DELETE /books/:id", () => {
     //Invalid id returns error
     test("Invalid id returns error", async () => {
         try {
-            await axios.delete(`${baseUrl}/books/abc`);
+            await axios.delete(`${baseUrl}/api/books/abc`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -613,7 +610,7 @@ describe("DELETE /books/:id", () => {
     //Nonexistant id returns error
     test("Nonexistant id returns error", async () => {
         try {
-            await axios.delete(`${baseUrl}/books/3`);
+            await axios.delete(`${baseUrl}/api/books/3`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -630,8 +627,8 @@ describe("DELETE /books/:id", () => {
     //Cannot delete deleted book
     test("Cannot delete deleted book", async () => {
         try {
-            await axios.delete(`${baseUrl}/books/1`);
-            await axios.delete(`${baseUrl}/books/1`);
+            await axios.delete(`${baseUrl}/api/books/1`);
+            await axios.delete(`${baseUrl}/api/books/1`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -673,7 +670,7 @@ describe("GET /authors", () => {
 
     //No arguments returns all authors
     test("No arguments returns all authors", async () => {
-        let { data } = await axios.get(`${baseUrl}/authors`);
+        let { data } = await axios.get(`${baseUrl}/api/authors`);
         expect(data).toEqual([
             {
                 id: 1,
@@ -695,7 +692,7 @@ describe("GET /authors", () => {
 
     //Query by name returns author with matching name
     test("Query by name returns author with matching name", async () => {
-        let { data } = await axios.get(`${baseUrl}/authors?name=J.K. Rowling`);
+        let { data } = await axios.get(`${baseUrl}/api/authors?name=J.K. Rowling`);
         expect(data).toEqual([
             {
                 id: 3,
@@ -707,14 +704,14 @@ describe("GET /authors", () => {
 
     //Query by name that doesnt exist returns empty array
     test("Query by name that doesnt exist returns empty array", async () => {
-        let { data } = await axios.get(`${baseUrl}/authors?name=Stephen King`);
+        let { data } = await axios.get(`${baseUrl}/api/authors?name=Stephen King`);
         expect(data).toEqual([]);
     });
 
     //Invalid query returns error
     test("Invalid query returns error", async () => {
         try {
-            await axios.get(`${baseUrl}/authors?foo=bar`);
+            await axios.get(`${baseUrl}/api/authors?foo=bar`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -731,7 +728,7 @@ describe("GET /authors", () => {
     //Invalid query value returns error
     test("More than one query returns error", async () => {
         try {
-            await axios.get(`${baseUrl}/authors?name=J.K. Rowling&age=30`);
+            await axios.get(`${baseUrl}/api/authors?name=J.K. Rowling&age=30`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -774,7 +771,7 @@ describe("GET /authors/:id", () => {
     });
     //Valid id returns author
     test("Valid id returns author", async () => {
-        let { data } = await axios.get(`${baseUrl}/authors/1`);
+        let { data } = await axios.get(`${baseUrl}/api/authors/1`);
         expect(data).toEqual({
             id: 1,
             name: "Ray Bradbury",
@@ -785,7 +782,7 @@ describe("GET /authors/:id", () => {
     //Nonexistant id returns error
     test("Nonexistant id returns error", async () => {
         try {
-            await axios.get(`${baseUrl}/authors/4`);
+            await axios.get(`${baseUrl}/api/authors/4`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -802,7 +799,7 @@ describe("GET /authors/:id", () => {
     //Invalid id type
     test("Invalid id type returns error", async () => {
         try {
-            await axios.get(`${baseUrl}/authors/foo`);
+            await axios.get(`${baseUrl}/api/authors/foo`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -826,7 +823,7 @@ describe("POST /authors", () => {
 
     //Valid data returns new author
     test("Valid data returns new author", async () => {
-        let { data } = await axios.post(`${baseUrl}/authors`, {
+        let { data } = await axios.post(`${baseUrl}/api/authors`, {
             name: "Stephen King",
             bio: "American author",
         });
@@ -840,11 +837,11 @@ describe("POST /authors", () => {
     //Author already exists returns error
     test("Author already exists returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/authors`, {
+            await axios.post(`${baseUrl}/api/authors`, {
                 name: "Stephen King",
                 bio: "American author",
             });
-            await axios.post(`${baseUrl}/authors`, {
+            await axios.post(`${baseUrl}/api/authors`, {
                 name: "Stephen King",
                 bio: "American author",
             });
@@ -864,7 +861,7 @@ describe("POST /authors", () => {
     //Missing name returns error
     test("Missing name returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/authors`, {
+            await axios.post(`${baseUrl}/api/authors`, {
                 bio: "American author",
             });
         } catch (error) {
@@ -883,7 +880,7 @@ describe("POST /authors", () => {
     //Missing bio returns error\
     test("Missing bio returns error", async () => {
         try {
-            await axios.post(`${baseUrl}/authors`, {
+            await axios.post(`${baseUrl}/api/authors`, {
                 name: "Stephen King",
             });
         } catch (error) {
@@ -901,7 +898,7 @@ describe("POST /authors", () => {
 
     //ID is autoincremented
     test("ID is autoincremented", async () => {
-        let { data } = await axios.post(`${baseUrl}/authors`, {
+        let { data } = await axios.post(`${baseUrl}/api/authors`, {
             name: "Stephen King",
             bio: "American author",
         });
@@ -910,7 +907,7 @@ describe("POST /authors", () => {
             name: "Stephen King",
             bio: "American author",
         });
-        let { data: data2 } = await axios.post(`${baseUrl}/authors`, {
+        let { data: data2 } = await axios.post(`${baseUrl}/api/authors`, {
             name: "J.K. Rowling",
             bio: "English author",
         });
@@ -950,14 +947,14 @@ describe("DELETE /authors/:id", () => {
 
     //Delete author with no books
     test("Delete author with no books", async () => {
-        let { status } = await axios.delete(`${baseUrl}/authors/3`);
+        let { status } = await axios.delete(`${baseUrl}/api/authors/3`);
         expect(status).toEqual(200);
     });
 
     //Delete author with books returns error
     test("Delete author with books returns error", async () => {
         try {
-            await axios.delete(`${baseUrl}/authors/1`);
+            await axios.delete(`${baseUrl}/api/authors/1`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -974,7 +971,7 @@ describe("DELETE /authors/:id", () => {
     //Missing id returns error
     test("Missing id returns error", async () => {
         try {
-            await axios.delete(`${baseUrl}/authors/`);
+            await axios.delete(`${baseUrl}/api/authors/`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -991,7 +988,7 @@ describe("DELETE /authors/:id", () => {
     //Invalid id returns error
     test("Invalid id returns error", async () => {
         try {
-            await axios.delete(`${baseUrl}/authors/abc`);
+            await axios.delete(`${baseUrl}/api/authors/abc`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -1008,7 +1005,7 @@ describe("DELETE /authors/:id", () => {
     //Nonexistent id returns error
     test("Nonexistent id returns error", async () => {
         try {
-            await axios.delete(`${baseUrl}/authors/4`);
+            await axios.delete(`${baseUrl}/api/authors/4`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
@@ -1024,9 +1021,9 @@ describe("DELETE /authors/:id", () => {
 
     //Cannot delete deleted author
     test("Cannot delete deleted author", async () => {
-        await axios.delete(`${baseUrl}/authors/3`);
+        await axios.delete(`${baseUrl}/api/authors/3`);
         try {
-            await axios.delete(`${baseUrl}/authors/3`);
+            await axios.delete(`${baseUrl}/api/authors/3`);
         } catch (error) {
             let errorObj = error as AxiosError;
             if (errorObj.response === undefined) {
