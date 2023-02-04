@@ -1,3 +1,10 @@
+import { Button, Table, TableCell } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import Tab from "@mui/material/Tab";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
+import TextField from "@mui/material/TextField";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -9,8 +16,7 @@ export const AddAuthor = (props: AddAuthorProps) => {
     const [name, setName] = React.useState<string>("");
     const [bio, setBio] = React.useState<string>("");
 
-    async function handleSubmitAuthor(event: React.SyntheticEvent) {
-        event.preventDefault();
+    async function handleSubmitAuthor() {
         //make sure all fields non-empty
         if (!(name && bio)) {
             alert("Please fill out all fields");
@@ -60,49 +66,52 @@ export const AddAuthor = (props: AddAuthorProps) => {
     }
 
     return (
-        <form onSubmit={handleSubmitAuthor}>
-            <table>
-                <tbody>
-                    <tr>
-                        <td width={"30%"}>
+        <FormControl>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableBody>
+                    <TableRow>
+                        <TableCell width={"30%"} align="right">
                             <label htmlFor="name">Name</label>
-                        </td>
-                        <td width={"70%"}>
-                            <input
+                        </TableCell>
+                        <TableCell width={"70%"}>
+                            <TextField
                                 type="text"
                                 id="name"
                                 name="name"
                                 value={name}
                                 onChange={handleInputChange}
                             />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell align="right">
                             <label htmlFor="bio">Biography</label>
-                        </td>
-                        <td>
-                            <textarea
+                        </TableCell>
+                        <TableCell>
+                            <TextareaAutosize
                                 id="bio"
                                 name="bio"
                                 value={bio}
                                 onChange={handleInputChange}
                                 cols={50}
-                                rows={2}
                             />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
-                            <input
-                                type="submit"
-                                value="Submit"
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell colSpan={2}>
+                            <Button
+                                variant="contained"
                                 style={{ width: "100%", height: 40 }}
-                            />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </form>
+                                onClick={() => {
+                                    handleSubmitAuthor();
+                                }}
+                            >
+                                Submit
+                            </Button>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </FormControl>
     );
 };

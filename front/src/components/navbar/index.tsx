@@ -10,6 +10,7 @@ function Navbar() {
                     <NavLink to="/">Home</NavLink>
                     <NavLink to="/library">Library</NavLink>
                     <NavLink to="/add">Add</NavLink>
+                    <NavLink to="/edit">Edit</NavLink>
                     <NavLink to="/search">Search</NavLink>
                 </NavMenu>
             </Nav>

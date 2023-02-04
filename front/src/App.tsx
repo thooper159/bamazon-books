@@ -5,6 +5,7 @@ import Home from "./pages/";
 import Library from "./pages/library";
 import Add from "./pages/add";
 import Search from "./pages/search";
+import Edit from "./pages/edit";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/library" element={<Library />} />
                 <Route path="/add" element={<Add />} />
+                <Route path="/edit" element={<Edit />} />
                 <Route path="/search" element={<Search />} />
                 <Route
                     path="*"

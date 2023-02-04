@@ -180,10 +180,10 @@ async function verifyBookData(
         };
     }
 
-    //make sure book with same title and year and author doesnt already exist
+    //make sure book with same title and year and author and genre doesnt already exist
     let book: BookRow[] | undefined = await db.get(
-        "SELECT * FROM books WHERE title = ? AND pub_year = ? AND author_id = ?",
-        [req.body.title, req.body.pub_year, req.body.author_id]
+        "SELECT * FROM books WHERE title = ? AND pub_year = ? AND author_id = ? AND genre = ?",
+        [req.body.title, req.body.pub_year, req.body.author_id, req.body.genre]
     );
 
     if (book) {
@@ -241,7 +241,6 @@ app.put("/api/books", async (req, res: Response<Error>) => {
 
 app.put("/api/books/:id", async (req, res: Response<BookRow | Error>) => {
     //check if id is a number and points to a book
-    console.log("here");
     if (isNaN(Number(req.params.id))) {
         return res.status(400).json({ error: "Invalid book id" });
     }
@@ -260,7 +259,6 @@ app.put("/api/books/:id", async (req, res: Response<BookRow | Error>) => {
         return res.status(error.status).json({ error: error.error });
     }
 
-    console.log("here");
     //update book
     let statement = await db.prepare(
         "UPDATE books SET author_id = ?, title = ?, pub_year = ?, genre = ? WHERE id = ?"
@@ -272,7 +270,6 @@ app.put("/api/books/:id", async (req, res: Response<BookRow | Error>) => {
         req.body.genre,
         req.params.id,
     ]);
-    console.log(req.body);
     await statement.run();
     //return updated book
     let newBook = await db.get("SELECT * FROM books WHERE id = ?", [

@@ -1,3 +1,17 @@
+import {
+    Button,
+    InputLabel,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    TableCell,
+    TableRow,
+} from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableHead from "@mui/material/TableHead";
+import TextField from "@mui/material/TextField";
 import React from "react";
 import { Link } from "react-router-dom";
 import { AuthorRes } from "../../types";
@@ -11,16 +25,24 @@ export const AddBook = (props: AddBookProps) => {
     const [author_id, setAuthor] = React.useState<string>("");
     const [pub_year, setYear] = React.useState<string>("");
     const [genre, setGenre] = React.useState<string>("");
+    const [validTitle, setValidTitle] = React.useState<boolean>(false);
+    const [validYear, setValidYear] = React.useState<boolean>(false);
 
     function validateInput(input: string): void {
-        document.getElementsByName(input)[0]!.style.backgroundColor = "";
+        if (input === "title") {
+            setValidTitle(true);
+        } else if (input === "pub_year") {
+            setValidYear(true);
+        }
     }
     function invalidateInput(input: string): void {
-        document.getElementsByName(input)[0]!.style.backgroundColor =
-            "lightcoral";
+        if (input === "title") {
+            setValidTitle(false);
+        } else if (input === "pub_year") {
+            setValidYear(false);
+        }
     }
-    async function handleSubmitBook(event: React.SyntheticEvent) {
-        event.preventDefault();
+    async function handleSubmitBook() {
         if (!(title && author_id && pub_year && genre)) {
             alert("Please fill out all fields");
             return;
@@ -54,7 +76,7 @@ export const AddBook = (props: AddBookProps) => {
         }
     }
 
-    function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    function handleSelectChange(event: SelectChangeEvent) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
@@ -72,7 +94,13 @@ export const AddBook = (props: AddBookProps) => {
         const name = target.name;
 
         if (name === "title") {
-            setTitle(value);
+            if (value.length > 0) {
+                setTitle(value);
+                validateInput("title");
+            } else {
+                invalidateInput("title");
+                setTitle("");
+            }
         } else if (name === "pub_year") {
             if (isNaN(+value) || value.length > 4) {
                 invalidateInput("pub_year");
@@ -85,93 +113,101 @@ export const AddBook = (props: AddBookProps) => {
     }
 
     return (
-        <form onSubmit={handleSubmitBook}>
-            <table>
-                <tbody>
-                    <tr>
-                        <td width={"30%"}>
+        <FormControl>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableBody>
+                    <TableRow>
+                        <TableCell width={"30%"} align="right">
                             <label htmlFor="title">Title</label>
-                        </td>
-                        <td width={"70%"}>
-                            <input
-                                type="text"
+                        </TableCell>
+                        <TableCell width={"70%"}>
+                            <TextField
                                 id="title"
                                 name="title"
+                                variant="outlined"
                                 value={title}
                                 onChange={handleInputChange}
+                                error={!validTitle}
                             />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label htmlFor="author_id">
-                                Author (id){" "}
-                                <Link to={"/library#props.authors"}>
-                                    (Reference)
-                                </Link>
-                            </label>
-                        </td>
-                        <td>
-                            <select 
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell align="right">
+                            <label htmlFor="author_id">Author</label>
+                        </TableCell>
+                        <TableCell>
+                            <Select
                                 name="author_id"
                                 id="author_id"
                                 value={author_id}
-                                onChange={handleSelectChange}>
-                                <option value="">Select an author</option>
+                                onChange={handleSelectChange}
+                                defaultValue=""
+                            >
+                                <MenuItem value="">Select an author</MenuItem>
                                 {props.authors.map((a) => (
-                                    <option key={a.id} value={a.id}>
+                                    <MenuItem key={a.id} value={a.id}>
                                         {a.name}
-                                    </option>
+                                    </MenuItem>
                                 ))}
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
+                            </Select>
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell align="right">
                             <label htmlFor="pub_year">Year</label>
-                        </td>
-                        <td>
-                            <input
+                        </TableCell>
+                        <TableCell>
+                            <TextField
                                 type="text"
                                 id="pub_year"
                                 name="pub_year"
                                 value={pub_year}
                                 onChange={handleInputChange}
+                                error={!validYear}
                             />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell align="right">
                             <label htmlFor="genre">Genre</label>
-                        </td>
-                        <td>
-                            <select
+                        </TableCell>
+                        <TableCell>
+                            <Select
+                                value={genre}
                                 name="genre"
                                 id="genre"
-                                value={genre}
                                 onChange={handleSelectChange}
+                                inputProps={{ "aria-label": "Without label" }}
                             >
-                                <option value="">Select a genre</option>
-                                <option value="dystopian">Dystopian</option>
-                                <option value="romance">Romance</option>
-                                <option value="fantasy">Fantasy</option>
-                                <option value="horror">Horror</option>
-                                <option value="mystery">Mystery</option>
-                                <option value="sci-fi">Sci-Fi</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colSpan={2}>
-                            <input
-                                type="submit"
-                                value="Submit"
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={"dystopian"}>
+                                    Dystopian
+                                </MenuItem>
+                                <MenuItem value={"romance"}>Romance</MenuItem>
+                                <MenuItem value={"fantasy"}>Fantasy</MenuItem>
+                                <MenuItem value={"horror"}>Horror</MenuItem>
+                                <MenuItem value={"mystery"}>Mystery</MenuItem>
+                                <MenuItem value={"sci-fi"}>Sci-Fi</MenuItem>
+                            </Select>
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell colSpan={2}>
+                            <Button
+                                variant="contained"
                                 style={{ width: "100%", height: 40 }}
-                            />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </form>
+                                onClick={() => {
+                                    handleSubmitBook();
+                                }}
+                            >
+                                Submit
+                            </Button>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </FormControl>
     );
 };

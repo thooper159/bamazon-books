@@ -578,6 +578,232 @@ describe("PUT /books/:id", () => {
             genre: "dystopian",
         });
     });
+
+    //update author
+    test("Update author", async () => {
+        let { data } = await axios.put(`${baseUrl}/api/books/1`, {
+            author_id: 2,
+            title: "Fahrenheit 451",
+            pub_year: "1953",
+            genre: "dystopian",
+        });
+        expect(data).toEqual({
+            id: 1,
+            author_id: 2,
+            title: "Fahrenheit 451",
+            pub_year: "1953",
+            genre: "dystopian",
+        });
+    });
+
+    //update pub_year
+    test("Update pub_year", async () => {
+        let { data } = await axios.put(`${baseUrl}/api/books/1`, {
+            author_id: 1,
+            title: "Fahrenheit 451",
+            pub_year: "1954",
+            genre: "dystopian",
+        });
+        expect(data).toEqual({
+            id: 1,
+            author_id: 1,
+            title: "Fahrenheit 451",
+            pub_year: "1954",
+            genre: "dystopian",
+        });
+    });
+
+    //update genre
+    test("Update genre", async () => {
+        let { data } = await axios.put(`${baseUrl}/api/books/1`, {
+            author_id: 1,
+            title: "Fahrenheit 451",
+            pub_year: "1953",
+            genre: "fantasy",
+        });
+        expect(data).toEqual({
+            id: 1,
+            author_id: 1,
+            title: "Fahrenheit 451",
+            pub_year: "1953",
+            genre: "fantasy",
+        });
+    });
+
+    //update all
+    test("Update all", async () => {
+        let { data } = await axios.put(`${baseUrl}/api/books/1`, {
+            author_id: 2,
+            title: "Fahrenheit 451: The temperature at which book paper catches fire and burns.",
+            pub_year: "1954",
+            genre: "sci-fi",
+        });
+        expect(data).toEqual({
+            id: 1,
+            author_id: 2,
+            title: "Fahrenheit 451: The temperature at which book paper catches fire and burns.",
+            pub_year: "1954",
+            genre: "sci-fi",
+        });
+    });
+
+    //try to update non-existent book
+
+    test("Try to update non-existent book", async () => {
+        try {
+            await axios.put(`${baseUrl}/api/books/4`, {
+                author_id: 1,
+                title: "Fahrenheit 451",
+                pub_year: "1953",
+                genre: "dystopian",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(404);
+            expect(response.data).toEqual({
+                error: "Book not found",
+            });
+        }
+    });
+
+    //try to update book with invalid id
+    test("Try to update book with invalid id", async () => {
+        try {
+            await axios.put(`${baseUrl}/api/books/ABC`, {
+                author_id: 1,
+                title: "Fahrenheit 451",
+                pub_year: "1953",
+                genre: "dystopian",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid book id",
+            });
+        }
+    });
+
+    //try to update book with invalid author_id
+    test("Try to update book with invalid author_id", async () => {
+        try {
+            await axios.put(`${baseUrl}/api/books/1`, {
+                author_id: "abc",
+                title: "Fahrenheit 451",
+                pub_year: "1953",
+                genre: "dystopian",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Author does not exist",
+            });
+        }
+    });
+
+
+    //try to update book with invalid pub_year
+    test("Try to update book with invalid pub_year", async () => {
+        try {
+            await axios.put(`${baseUrl}/api/books/1`, {
+                author_id: 1,
+                title: "Fahrenheit 451",
+                pub_year: "19522",
+                genre: "dystopian",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid publication year",
+            });
+        }
+    });
+
+    //try to update book with invalid genre
+
+    test("Try to update book with invalid genre", async () => {
+        try {
+            await axios.put(`${baseUrl}/api/books/1`, {
+                author_id: 1,
+                title: "Fahrenheit 451",
+                pub_year: "1953",
+                genre: "dystopian fiction",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Invalid genre",
+            });
+        }
+    });
+
+    //try to update book with missing field
+
+    test("Try to update book with missing field", async () => {
+        try {
+            await axios.put(`${baseUrl}/api/books/1`, {
+                author_id: 1,
+                title: "Fahrenheit 451",
+                pub_year: "1953",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(400);
+            expect(response.data).toEqual({
+                error: "Missing genre",
+            });
+        }
+    });
+    
+    //try to put without id
+    test("Try to update book without id", async () => {
+        try {
+            await axios.put(`${baseUrl}/api/books/`, {
+                author_id: 1,
+                title: "Fahrenheit 451",
+                pub_year: "1953",
+                genre: "dystopian",
+            });
+        } catch (error) {
+            let errorObj = error as AxiosError;
+            if (errorObj.response === undefined) {
+                throw errorObj;
+            }
+            let { response } = errorObj;
+            expect(response.status).toEqual(405);
+            expect(response.data).toEqual({
+                error: "Method not allowed. Id must be specified",
+            });
+        }
+    });
+
 });
 
 
