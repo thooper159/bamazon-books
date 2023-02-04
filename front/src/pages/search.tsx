@@ -1,3 +1,15 @@
+import {
+    FormControl,
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableRow,
+    MenuItem,
+    Select,
+    TextField,
+} from "@mui/material";
+import Tab from "@mui/material/Tab";
 import React from "react";
 import { Link } from "react-router-dom";
 import { SearchResults } from "../components/search-results";
@@ -12,12 +24,13 @@ function Search() {
     const [title, setTitle] = React.useState<string>("");
     const [author_id, setAuthor] = React.useState<string>("");
     const [pub_year, setYear] = React.useState<string>("");
+    const [validYear, setValidYear] = React.useState<boolean>(true);
     const [genre, setGenre] = React.useState<string>("");
     const [id, setId] = React.useState<string>("");
+    const [validId, setValidId] = React.useState<boolean>(true);
     const [query, setQuery] = React.useState<string>("");
     const [authors, setAuthors] = React.useState<AuthorRes[]>([]);
 
-    
     React.useEffect(() => {
         const request = new Request("http://localhost:3000/api/authors");
         fetchData(request)
@@ -29,12 +42,11 @@ function Search() {
             });
     }, []);
 
-
     React.useEffect(() => {
         getCurrentQuery();
     }, [title, author_id, pub_year, genre]);
 
-    function handleInputChange(event: React.ChangeEvent<HTMLFormElement>) {
+    function handleInputChange(event: any) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
@@ -42,38 +54,29 @@ function Search() {
         if (name === "title") {
             setTitle(value);
         } else if (name === "author_id") {
-            //validate input
-            if (isNaN(value)) {
-                invalidateInput("author_id");
-                setAuthor("");
-            } else {
-                validateInput("author_id");
-                setAuthor(value);
-            }
+            setAuthor(value);
         } else if (name === "pub_year") {
             if (isNaN(value) || value.length > 4) {
-                invalidateInput("pub_year");
+                setValidYear(false);
                 setYear("");
             } else {
-                validateInput("pub_year");
+                setValidYear(true);
                 setYear(value);
             }
         } else if (name === "genre") {
             setGenre(value);
         } else if (name === "id") {
             if (isNaN(value)) {
-                invalidateInput("id");
+                setValidId(false);
                 setId("");
             } else {
-                validateInput("id");
+                setValidId(true);
                 setId(value);
             }
         }
     }
 
-    function handleSubmit(event: React.SyntheticEvent): void {
-        //get the generated query from event
-        event.preventDefault();
+    function handleSubmit(): void {
         const params = new URLSearchParams({
             title: title,
             author_id: author_id,
@@ -100,18 +103,9 @@ function Search() {
         }
     }
 
-    function handleSubmitId(event: React.SyntheticEvent): void {
-        event.preventDefault();
+    function handleSubmitId(): void {
         const queryBuilder = `http://localhost:3000/api/books/${id}`;
         setQuery(queryBuilder);
-    }
-
-    function validateInput(input: string): void {
-        document.getElementsByName(input)[0]!.style.backgroundColor = "";
-    }
-    function invalidateInput(input: string): void {
-        document.getElementsByName(input)[0]!.style.backgroundColor =
-            "lightcoral";
     }
 
     function getCurrentQuery(): void {
@@ -137,100 +131,136 @@ function Search() {
             <br />
             <div id="search-box" className="column">
                 <b>Search for books by title, author_id, year, and/or genre.</b>
-                <form onChange={handleInputChange} onSubmit={handleSubmit}>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td width={"30%"}>
+                <FormControl fullWidth>
+                    <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell width={"30%"} align="right">
                                     <label>Title</label>
-                                </td>
-                                <td width={"70%"}>
-                                    <input type="text" name="title" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label>
-                                        Author
-                                    </label>
-                                </td>
-                                <td>
+                                </TableCell>
+                                <TableCell width={"70%"}>
+                                    <TextField
+                                        type="text"
+                                        name="title"
+                                        value={title}
+                                        onChange={handleInputChange}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell align="right">
+                                    <label>Author</label>
+                                </TableCell>
+                                <TableCell>
                                     {/* <input type="text" name="author_id" /> */}
-                                    <select name="author_id">
-                                        <option value="">-</option>
+                                    <Select
+                                        name="author_id"
+                                        id="author_id"
+                                        value={author_id}
+                                        onChange={handleInputChange}
+                                        defaultValue=""
+                                    >
+                                        <MenuItem value="">-</MenuItem>
                                         {authors.map((author) => (
-                                            <option
+                                            <MenuItem
                                                 key={author.id}
                                                 value={author.id}
                                             >
                                                 {author.name}
-                                            </option>
+                                            </MenuItem>
                                         ))}
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                    </Select>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell align="right">
                                     <label>Year</label>
-                                </td>
-                                <td>
-                                    <input type="text" name="pub_year" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        type="text"
+                                        name="pub_year"
+                                        onChange={handleInputChange}
+                                        error={!validYear}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell align="right">
                                     <label>Genre</label>
-                                </td>
-                                <td>
-                                    <select name="genre">
-                                        <option value="">-</option>
-                                        <option value="dystopian">
+                                </TableCell>
+                                <TableCell>
+                                    <Select
+                                        name="genre"
+                                        onChange={handleInputChange}
+                                    >
+                                        <MenuItem value="">-</MenuItem>
+                                        <MenuItem value="dystopian">
                                             Dystopian
-                                        </option>
-                                        <option value="romance">Romance</option>
-                                        <option value="fantasy">Fantasy</option>
-                                        <option value="horror">Horror</option>
-                                        <option value="mystery">Mystery</option>
-                                        <option value="sci-fi">Sci-Fi</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colSpan={2}>
+                                        </MenuItem>
+                                        <MenuItem value="romance">
+                                            Romance
+                                        </MenuItem>
+                                        <MenuItem value="fantasy">
+                                            Fantasy
+                                        </MenuItem>
+                                        <MenuItem value="horror">
+                                            Horror
+                                        </MenuItem>
+                                        <MenuItem value="mystery">
+                                            Mystery
+                                        </MenuItem>
+                                        <MenuItem value="sci-fi">
+                                            Sci-Fi
+                                        </MenuItem>
+                                    </Select>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell colSpan={2} align="center">
                                     <strong>
                                         <span id="query-preview"></span>
                                     </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colSpan={2}>
-                                    <button
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell colSpan={2}>
+                                    <Button
                                         style={{ width: "100%", height: 40 }}
-                                        type="submit"
+                                        onClick={() => handleSubmit()}
+                                        variant="contained"
                                     >
                                         Search
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
                     <br />
-                </form>
+                </FormControl>
                 <b> -- or --</b>
                 <br />
                 <br />
                 <b>Search for book by id</b>
                 <div id="search-box">
-                    <form
-                        onChange={handleInputChange}
-                        onSubmit={handleSubmitId}
-                    >
+                    <FormControl fullWidth>
                         <label>
                             ID:
-                            <input type="text" name="id" />
+                            <TextField
+                                onChange={handleInputChange}
+                                type="text"
+                                name="id"
+                                error={!validId}
+                            />
                         </label>
-                        <input type="submit" id="submit-id" value="Submit" />
-                    </form>
+                        <Button
+                            variant="contained"
+                            style={{ width: "100%", height: 40 }}
+                            onClick={() => handleSubmitId()}
+                        >
+                            Search
+                        </Button>
+                    </FormControl>
                 </div>
             </div>
 

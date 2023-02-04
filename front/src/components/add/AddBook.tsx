@@ -28,20 +28,6 @@ export const AddBook = (props: AddBookProps) => {
     const [validTitle, setValidTitle] = React.useState<boolean>(false);
     const [validYear, setValidYear] = React.useState<boolean>(false);
 
-    function validateInput(input: string): void {
-        if (input === "title") {
-            setValidTitle(true);
-        } else if (input === "pub_year") {
-            setValidYear(true);
-        }
-    }
-    function invalidateInput(input: string): void {
-        if (input === "title") {
-            setValidTitle(false);
-        } else if (input === "pub_year") {
-            setValidYear(false);
-        }
-    }
     async function handleSubmitBook() {
         if (!(title && author_id && pub_year && genre)) {
             alert("Please fill out all fields");
@@ -96,17 +82,17 @@ export const AddBook = (props: AddBookProps) => {
         if (name === "title") {
             if (value.length > 0) {
                 setTitle(value);
-                validateInput("title");
+                setValidTitle(true);
             } else {
-                invalidateInput("title");
+                setValidTitle(false);
                 setTitle("");
             }
         } else if (name === "pub_year") {
             if (isNaN(+value) || value.length > 4) {
-                invalidateInput("pub_year");
+                setValidYear(false);
                 setYear("");
             } else {
-                validateInput("pub_year");
+                setValidYear(true);
                 setYear(value);
             }
         }
@@ -114,7 +100,7 @@ export const AddBook = (props: AddBookProps) => {
 
     return (
         <FormControl>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <Table sx={{ minWidth: 650 }}>
                 <TableBody>
                     <TableRow>
                         <TableCell width={"30%"} align="right">

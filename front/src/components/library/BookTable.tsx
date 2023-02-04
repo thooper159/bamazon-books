@@ -1,3 +1,7 @@
+import { TableRow, TableBody } from "@mui/material";
+import Table from "@mui/material/Table";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
 import { AuthorRes, BookRes } from "../../types";
 
 interface TableProps {
@@ -17,37 +21,43 @@ export const BookTable: React.FC<TableProps> = (props: TableProps) => {
         books = [books];
     }
     return (
-        <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>id</th>
-                    <th>Author</th>
-                    <th>Year</th>
-                    <th>Genre</th>
-                </tr>
-            </thead>
-            <tbody>
+        <Table sx={{ width: "80%" }}>
+            <TableHead>
+                <TableRow>
+                    <TableCell>Title</TableCell>
+                    <TableCell>id</TableCell>
+                    <TableCell>Author</TableCell>
+                    <TableCell>Year</TableCell>
+                    <TableCell>Genre</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
                 {books.length === 0 ? (
-                    <tr>
-                        <td colSpan={5}>No books found</td>
-                    </tr>
+                    <TableRow>
+                        <TableCell colSpan={5}>No books found</TableCell>
+                    </TableRow>
                 ) : (
                     books
                         .sort((a, b) => a.title.localeCompare(b.title))
                         .map((book) => (
-                            <tr key={book.id}>
-                                <td width={"35%"}>{book.title}</td>
-                                <td width={"5%"}>{book.id}</td>
-                                <td width={"25%"}>
+                            <TableRow key={book.id}>
+                                <TableCell width={"35%"}>
+                                    {book.title}
+                                </TableCell>
+                                <TableCell width={"5%"}>{book.id}</TableCell>
+                                <TableCell width={"25%"}>
                                     {getAuthorName(book.author_id, authors)}
-                                </td>
-                                <td width={"10%"}>{book.pub_year}</td>
-                                <td width={"25%"}>{book.genre}</td>
-                            </tr>
+                                </TableCell>
+                                <TableCell width={"10%"}>
+                                    {book.pub_year}
+                                </TableCell>
+                                <TableCell width={"25%"}>
+                                    {book.genre}
+                                </TableCell>
+                            </TableRow>
                         ))
                 )}
-            </tbody>
-        </table>
+            </TableBody>
+        </Table>
     );
 };

@@ -1,3 +1,6 @@
+import { Table, TableCell, TableRow } from "@mui/material";
+import TableBody from "@mui/material/TableBody";
+import TableHead from "@mui/material/TableHead";
 import { AuthorRes, BookRes } from "../../types";
 
 interface TableProps {
@@ -7,29 +10,29 @@ interface TableProps {
 export const AuthorTable: React.FC<TableProps> = (props: TableProps) => {
     let authors = props.authors;
     return (
-        <table>
-            <thead>
-                <tr>
-                    <th>id</th>
-                    <th>Name</th>
-                    <th>Bio</th>
-                </tr>
-            </thead>
-            <tbody>
+        <Table sx={{ width: "80%" }}>
+            <TableHead>
+                <TableRow>
+                    <TableCell>id</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Bio</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
                 {authors.length === 0 ? (
-                    <tr>
-                        <td colSpan={3}>No authors found</td>
-                    </tr>
+                    <TableRow>
+                        <TableCell colSpan={3}>No authors found</TableCell>
+                    </TableRow>
                 ) : (
                     authors.map((author) => (
-                        <tr key={author.id}>
-                            <td width={"5%"}>{author.id}</td>
-                            <td width={"25%"}>{author.name}</td>
-                            <td width={"70%"}>{author.bio}</td>
-                        </tr>
+                        <TableRow key={author.id}>
+                            <TableCell width={"5%"}>{author.id}</TableCell>
+                            <TableCell width={"25%"}>{author.name}</TableCell>
+                            <TableCell width={"70%"}>{author.bio}</TableCell>
+                        </TableRow>
                     ))
                 )}
-            </tbody>
-        </table>
+            </TableBody>
+        </Table>
     );
 };
