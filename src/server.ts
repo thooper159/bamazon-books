@@ -16,6 +16,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //allow cross origin requests
 app.use(function (req, res, next) {
+    //allow GET, POST, PUT, DELETE, OPTIONS
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header("Access-Control-Allow-Origin", "*");
     res.header(
         "Access-Control-Allow-Headers",

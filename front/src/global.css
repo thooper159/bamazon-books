@@ -13,6 +13,13 @@ b {
     margin-right: 20%;
     margin-left: 20%;
 }
+label {
+    font-size: 18px;
+}
+
+span {
+    font-size: 22px;
+}
 
 td,
 thead {

@@ -1,6 +1,5 @@
 import React from "react";
-import { AddBook } from "../components/add/AddBook";
-import { AddAuthor } from "../components/add/AddAuthor";
+import { EditBook } from "../components/edit";
 import { AuthorRes } from "../types";
 
 const fetchData = async (request: Request) => {
@@ -9,7 +8,6 @@ const fetchData = async (request: Request) => {
 };
 
 function Edit() {
-    //get authors to see if author id is valid
     const [authors, setAuthors] = React.useState<AuthorRes[]>([]);
     const [error, setError] = React.useState<Error | null>(null);
     const [updated, setUpdated] = React.useState<boolean>(false);
@@ -26,8 +24,14 @@ function Edit() {
     }, [updated]);
 
     return (
-        <div>
-        </div>
+        <>
+            <div>
+                <h1>Edit</h1>
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+                <EditBook authors={authors} />
+            </div>
+        </>
     );
 }
 

@@ -1,15 +1,21 @@
-export type Book = {
+let genres = [
+    "dystopian",
+    "romance",
+    "horror",
+    "mystery",
+    "fantasy",
+    "sci-fi",
+] as const;
+
+export type Genres = typeof genres[number];
+
+type Book = {
     author_id: string;
     title: string;
     pub_year: string;
-    genre:
-        | "dystopian"
-        | "romance"
-        | "horror"
-        | "mystery"
-        | "fantasy"
-        | "sci-fi";
+    genre: Genres;
 };
+
 export type BookRes = { id: string } & Book;
 
 export type Author = {

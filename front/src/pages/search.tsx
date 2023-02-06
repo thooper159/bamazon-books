@@ -159,8 +159,9 @@ function Search() {
                                         value={author_id}
                                         onChange={handleInputChange}
                                         defaultValue=""
+                                        displayEmpty
                                     >
-                                        <MenuItem value="">-</MenuItem>
+                                        <MenuItem value=""><em>Select an author</em></MenuItem>
                                         {authors.map((author) => (
                                             <MenuItem
                                                 key={author.id}
@@ -192,9 +193,14 @@ function Search() {
                                 <TableCell>
                                     <Select
                                         name="genre"
+                                        value={genre}
+                                        id="genre"
                                         onChange={handleInputChange}
+                                        displayEmpty
                                     >
-                                        <MenuItem value="">-</MenuItem>
+                                        <MenuItem value="">
+                                            <em>Select a genre</em>
+                                        </MenuItem>
                                         <MenuItem value="dystopian">
                                             Dystopian
                                         </MenuItem>
@@ -244,15 +250,23 @@ function Search() {
                 <b>Search for book by id</b>
                 <div id="search-box">
                     <FormControl fullWidth>
-                        <label>
-                            ID:
-                            <TextField
-                                onChange={handleInputChange}
-                                type="text"
-                                name="id"
-                                error={!validId}
-                            />
-                        </label>
+                        <Table>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>
+                                        <label>ID</label>
+                                    </TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            onChange={handleInputChange}
+                                            type="text"
+                                            name="id"
+                                            error={!validId}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
                         <Button
                             variant="contained"
                             style={{ width: "100%", height: 40 }}

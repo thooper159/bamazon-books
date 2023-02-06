@@ -111,6 +111,7 @@ export const AddBook = (props: AddBookProps) => {
                                 id="title"
                                 name="title"
                                 variant="outlined"
+                                sx={{ minWidth: 500 }}
                                 value={title}
                                 onChange={handleInputChange}
                                 error={!validTitle}
@@ -128,8 +129,11 @@ export const AddBook = (props: AddBookProps) => {
                                 value={author_id}
                                 onChange={handleSelectChange}
                                 defaultValue=""
+                                displayEmpty
                             >
-                                <MenuItem value="">Select an author</MenuItem>
+                                <MenuItem value="">
+                                    <em>Select an author</em>
+                                </MenuItem>
                                 {props.authors.map((a) => (
                                     <MenuItem key={a.id} value={a.id}>
                                         {a.name}
@@ -164,9 +168,10 @@ export const AddBook = (props: AddBookProps) => {
                                 id="genre"
                                 onChange={handleSelectChange}
                                 inputProps={{ "aria-label": "Without label" }}
+                                displayEmpty
                             >
                                 <MenuItem value="">
-                                    <em>None</em>
+                                    <em>Select a genre</em>
                                 </MenuItem>
                                 <MenuItem value={"dystopian"}>
                                     Dystopian
