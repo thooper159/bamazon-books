@@ -144,6 +144,7 @@ function Search() {
                                         name="title"
                                         value={title}
                                         onChange={handleInputChange}
+                                        sx={{ minWidth: 500 }}
                                     />
                                 </TableCell>
                             </TableRow>
