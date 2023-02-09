@@ -1,30 +1,44 @@
 import express, { Response } from "express";
+import  { BookRow, BookResponse, Error, AuthorRow, AuthorResponse, Genres, ID} from "./types.js";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import { fileURLToPath } from "url";
 import path from "path";
 import { Request } from "express-serve-static-core";
 import { ParsedQs } from "qs";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import { z } from "zod";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let app = express();
-app.use(express.json());
+
 // app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "public")));
 
 //allow cross origin requests
-app.use(function (req, res, next) {
-    //allow GET, POST, PUT, DELETE, OPTIONS
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-});
+// app.use(function (req, res, next) {
+//     //allow GET, POST, PUT, DELETE, OPTIONS
+//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
+// });
+app.use(
+    cors({
+        origin: ["http://localhost:3000", "http://localhost:3001"],
+        credentials: true,
+    })
+);
+app.use(cookieParser());
+app.use(express.json());
+
 // create database "connection"
 let db = await open({
     filename: "../database.db",
@@ -32,45 +46,6 @@ let db = await open({
 });
 await db.get("PRAGMA foreign_keys = ON");
 
-let genres = [
-    "dystopian",
-    "romance",
-    "horror",
-    "mystery",
-    "fantasy",
-    "sci-fi",
-] as const;
-
-type Genres = typeof genres[number];
-
-type Book = {
-    author_id: string;
-    title: string;
-    pub_year: string;
-    genre: Genres;
-};
-
-type BookPut = {
-    author_id?: string;
-    title?: string;
-    pub_year?: string;
-    genre?: Genres;
-};
-
-type BookRow = { id: string } & Book;
-
-type Author = {
-    name: string;
-    bio: string;
-};
-type AuthorRow = { id: string } & Author;
-
-interface Error {
-    error: string;
-}
-type BookResponse = Response<BookRow[] | Error>;
-
-type AuthorResponse = Response<AuthorRow[] | Error>;
 
 app.get("/api/books", async (req, res: BookResponse) => {
     let numParams = Object.keys(req.query).length;
@@ -166,8 +141,10 @@ async function verifyBookData(
         };
     }
 
-    //make sure genre is valid
-    if (!genres.includes(req.body.genre)) {
+    //make sure genre is valid using Genre zod schema
+    try {
+        Genres.parse(req.body.genre);
+    } catch (err) {
         return {
             status: 400,
             error: "Invalid genre",
