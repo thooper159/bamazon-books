@@ -6,13 +6,18 @@ import Library from "./pages/library";
 import Add from "./pages/add";
 import Search from "./pages/search";
 import Edit from "./pages/edit";
+import Login from "./pages/login";
 
 function App() {
+
+    const requireAuth = () => {
+        //TODO: Implement authentication
+    };
     return (
         <Router>
             <Navbar />
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Home />}/>
                 <Route path="/library" element={<Library />} />
                 <Route path="/add" element={<Add />} />
                 <Route path="/edit" element={<Edit />} />
