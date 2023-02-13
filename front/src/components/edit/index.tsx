@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { title } from "process";
 import { checkAuth } from "../../utils/auth";
-import { Navigate } from "react-router-dom";
+import { Form, Navigate } from "react-router-dom";
 
 interface EditBookProps {
     authors: AuthorRes[];
@@ -78,6 +78,7 @@ export const EditBook = (props: EditBookProps) => {
     const handleDelete = async (id: string) => {
         const request = new Request(`http://localhost:3000/api/books/${id}`, {
             method: "DELETE",
+            credentials: "include",
         });
         sendRequest(request)
             .then((result) => {
@@ -106,6 +107,7 @@ export const EditBook = (props: EditBookProps) => {
                 pub_year: pub_year,
                 genre: genre,
             }),
+            credentials: "include",
         });
         sendRequest(request)
             .then((result) => {
@@ -242,19 +244,17 @@ export const EditBook = (props: EditBookProps) => {
                 <DialogContent>
                     {/* 
                         TODO:
-                        this and the addBook component are pretty much the same
-                        Today has been a long day, so I'm going to leave this as is for this assignment
-                        I'll come back and refactor this later
+                        this and the addBook component are pretty much the same, refactor!!!!
                     
                     */}
-                    <FormControl>
-                        <Table sx={{ minWidth: 800 }}>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell width={"30%"} align="right">
-                                        <label htmlFor="title">Title</label>
-                                    </TableCell>
-                                    <TableCell width={"70%"}>
+                    <Table sx={{ minWidth: 800 }}>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell width={"30%"} align="right">
+                                    <label htmlFor="title">Title</label>
+                                </TableCell>
+                                <TableCell width={"70%"}>
+                                    <FormControl>
                                         <TextField
                                             id="title"
                                             name="title"
@@ -264,15 +264,15 @@ export const EditBook = (props: EditBookProps) => {
                                             onChange={handleInputChange}
                                             error={!validTitle}
                                         />
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell align="right">
-                                        <label htmlFor="author_id">
-                                            Author
-                                        </label>
-                                    </TableCell>
-                                    <TableCell>
+                                    </FormControl>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell align="right">
+                                    <label htmlFor="author_id">Author</label>
+                                </TableCell>
+                                <TableCell>
+                                    <FormControl>
                                         <Select
                                             name="author_id"
                                             id="author_id"
@@ -293,13 +293,15 @@ export const EditBook = (props: EditBookProps) => {
                                                 </MenuItem>
                                             ))}
                                         </Select>
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell align="right">
-                                        <label htmlFor="pub_year">Year</label>
-                                    </TableCell>
-                                    <TableCell>
+                                    </FormControl>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell align="right">
+                                    <label htmlFor="pub_year">Year</label>
+                                </TableCell>
+                                <TableCell>
+                                    <FormControl>
                                         <TextField
                                             type="text"
                                             id="pub_year"
@@ -308,13 +310,15 @@ export const EditBook = (props: EditBookProps) => {
                                             onChange={handleInputChange}
                                             error={!validYear}
                                         />
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell align="right">
-                                        <label htmlFor="genre">Genre</label>
-                                    </TableCell>
-                                    <TableCell>
+                                    </FormControl>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell align="right">
+                                    <label htmlFor="genre">Genre</label>
+                                </TableCell>
+                                <TableCell>
+                                    <FormControl>
                                         <Select
                                             value={genre}
                                             name="genre"
@@ -347,11 +351,11 @@ export const EditBook = (props: EditBookProps) => {
                                                 Sci-Fi
                                             </MenuItem>
                                         </Select>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </FormControl>
+                                    </FormControl>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
                     <DialogActions>
                         <Button onClick={handleEditModalClose}>Cancel</Button>
                         <Button

@@ -31,6 +31,7 @@ export const AddAuthor = (props: AddAuthorProps) => {
                 name,
                 bio,
             }),
+            credentials: "include",
         });
         const response = (await fetch(request)) as Response;
         if (response.status === 201) {

@@ -44,6 +44,7 @@ export const AddBook = (props: AddBookProps) => {
                 pub_year,
                 genre,
             }),
+            credentials: "include",
         });
         const response = (await fetch(request)) as Response;
         if (response.status === 201) {

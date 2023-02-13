@@ -15,8 +15,6 @@ export function SearchResults(props: SearchResultsProps): JSX.Element {
     const [error, setError] = useState<Error | null>(null);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [books, setBooks] = useState<BookRes[]>([]);
-    // const [authors, setAuthors] = useState<AuthorRes[]>([]);
-
 
     useEffect(() => {
         setError(null);
@@ -31,19 +29,6 @@ export function SearchResults(props: SearchResultsProps): JSX.Element {
                 setError(error);
             });
     }, [props.query]);
-
-    // useEffect(() => {
-    //     const request = new Request("http://localhost:3000/api/authors");
-    //     fetchData(request)
-    //         .then((result) => {
-    //             setIsLoaded(true);
-    //             setAuthors(result);
-    //         })
-    //         .catch((error) => {
-    //             setIsLoaded(true);
-    //             setError(error);
-    //         });
-    // }, []);
 
     if (props.query === "") {
         return <div></div>;

@@ -12,7 +12,7 @@ import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import { fileURLToPath } from "url";
 import path from "path";
-import { Request } from "express-serve-static-core";
+import { ParamsDictionary, Request } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -29,16 +29,19 @@ let app = express();
 app.use(express.static(path.join(__dirname, "public")));
 
 //allow cross origin requests
-// app.use(function (req, res, next) {
-//     //allow GET, POST, PUT, DELETE, OPTIONS
-//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//     res.header("Access-Control-Allow-Origin", "*");
-//     res.header(
-//         "Access-Control-Allow-Headers",
-//         "Origin, X-Requested-With, Content-Type, Accept"
-//     );
-//     next();
-// });
+app.use(function (req, res, next) {
+    //allow GET, POST, PUT, DELETE, OPTIONS
+    res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+});
 app.use(
     cors({
         origin: ["http://localhost:3000", "http://localhost:3001"],
@@ -74,6 +77,7 @@ let cookieOptions: CookieOptions = {
 
 let authorize: RequestHandler = (req, res, next) => {
     let { token }: { token: string } = req.cookies;
+    console.log(token);
     if (token === undefined) {
         return res.status(401).json({ error: "Unauthorized" });
     }
@@ -183,13 +187,45 @@ app.get("/api/books/:id", async (req, res: Response<BookRow | Error>) => {
     }
 });
 
-//these types are atrocious, I know :( hopefully I can come back and make a better solution
+//these types are atrocious, I know :( hopefully I can come back and figure out something better
 async function verifyBookData(
     req:
-        | Request<{}, BookRow[] | Error, any, ParsedQs, Record<string, any>>
         | Request<
-              { id: string },
-              Error | BookRow,
+              ParamsDictionary,
+              | {
+                    id: string;
+                    author_id: string;
+                    title: string;
+                    pub_year: string;
+                    genre:
+                        | "dystopian"
+                        | "romance"
+                        | "horror"
+                        | "mystery"
+                        | "fantasy"
+                        | "sci-fi";
+                }[]
+              | { error: string },
+              any,
+              ParsedQs,
+              Record<string, any>
+          >
+        | Request<
+              ParamsDictionary,
+              | { error: string }
+              | {
+                    id: string;
+                    author_id: string;
+                    title: string;
+                    pub_year: string;
+                    genre:
+                        | "dystopian"
+                        | "romance"
+                        | "horror"
+                        | "mystery"
+                        | "fantasy"
+                        | "sci-fi";
+                },
               any,
               ParsedQs,
               Record<string, any>
@@ -263,7 +299,7 @@ async function verifyBookData(
     }
 }
 
-app.post("/api/books", async (req, res: BookResponse) => {
+app.post("/api/books", authorize, async (req, res: BookResponse) => {
     //make sure req body matches Book type
     if (!req.body) {
         return res.status(400).json({ error: "Missing request body" });
@@ -291,57 +327,62 @@ app.post("/api/books", async (req, res: BookResponse) => {
     let book = await db.get("SELECT * FROM books WHERE id = ?", [id]);
     return res.status(201).json(book);
 });
-app.put("/api/books", async (req, res: Response<Error>) => {
+app.put("/api/books", authorize, async (req, res: Response<Error>) => {
     return res
         .status(405)
         .json({ error: "Method not allowed. Id must be specified" });
 });
 
-app.put("/api/books/:id", async (req, res: Response<BookRow | Error>) => {
-    //check if id is a number and points to a book
-    if (isNaN(Number(req.params.id))) {
-        return res.status(400).json({ error: "Invalid book id" });
-    }
-    let currentBook: BookRow | undefined = await db.get(
-        "SELECT * FROM books WHERE id = ?",
-        [req.params.id]
-    );
-    if (!currentBook) {
-        return res.status(404).json({ error: "Book not found" });
-    }
-    if (!req.body) {
-        return res.status(400).json({ error: "Missing request body" });
-    }
-    let error = await verifyBookData(req);
-    if (error) {
-        return res.status(error.status).json({ error: error.error });
-    }
+app.put(
+    "/api/books/:id",
+    authorize,
+    async (req, res: Response<BookRow | Error>) => {
+        //check if id is a number and points to a book
+        if (isNaN(Number(req.params.id))) {
+            return res.status(400).json({ error: "Invalid book id" });
+        }
+        let currentBook: BookRow | undefined = await db.get(
+            "SELECT * FROM books WHERE id = ?",
+            [req.params.id]
+        );
+        if (!currentBook) {
+            return res.status(404).json({ error: "Book not found" });
+        }
+        if (!req.body) {
+            return res.status(400).json({ error: "Missing request body" });
+        }
+        //ts-ignore
+        let error = await verifyBookData(req);
+        if (error) {
+            return res.status(error.status).json({ error: error.error });
+        }
 
-    //update book
-    let statement = await db.prepare(
-        "UPDATE books SET author_id = ?, title = ?, pub_year = ?, genre = ? WHERE id = ?"
-    );
-    await statement.bind([
-        req.body.author_id,
-        req.body.title,
-        req.body.pub_year,
-        req.body.genre,
-        req.params.id,
-    ]);
-    await statement.run();
-    //return updated book
-    let newBook = await db.get("SELECT * FROM books WHERE id = ?", [
-        req.params.id,
-    ]);
-    return res.status(200).json(newBook);
-});
+        //update book
+        let statement = await db.prepare(
+            "UPDATE books SET author_id = ?, title = ?, pub_year = ?, genre = ? WHERE id = ?"
+        );
+        await statement.bind([
+            req.body.author_id,
+            req.body.title,
+            req.body.pub_year,
+            req.body.genre,
+            req.params.id,
+        ]);
+        await statement.run();
+        //return updated book
+        let newBook = await db.get("SELECT * FROM books WHERE id = ?", [
+            req.params.id,
+        ]);
+        return res.status(200).json(newBook);
+    }
+);
 
-app.delete("/api/books", async (req, res: BookResponse) => {
+app.delete("/api/books", authorize, async (req, res: BookResponse) => {
     return res
         .status(405)
         .json({ error: "Method not allowed. Id must be specified" });
 });
-app.delete("/api/books/:id", async (req, res: BookResponse) => {
+app.delete("/api/books/:id", authorize, async (req, res: BookResponse) => {
     if (!req.params.id) {
         return res.status(400).json({ error: "Id is required" });
     }
@@ -400,7 +441,7 @@ app.get("/api/authors/:id", async (req, res: Response<AuthorRow | Error>) => {
     }
 });
 
-app.post("/api/authors", async (req, res: AuthorResponse) => {
+app.post("/api/authors", authorize, async (req, res: AuthorResponse) => {
     //make sure all fields are present
     if (!req.body.name) {
         return res.status(400).json({ error: "Missing name" });
@@ -430,13 +471,13 @@ app.post("/api/authors", async (req, res: AuthorResponse) => {
     return res.status(201).json(author);
 });
 
-app.delete("/api/authors", async (req, res: BookResponse) => {
+app.delete("/api/authors", authorize, async (req, res: BookResponse) => {
     return res
         .status(405)
         .json({ error: "Method not allowed. Id must be specified" });
 });
 
-app.delete("/api/authors/:id", async (req, res: BookResponse) => {
+app.delete("/api/authors/:id", authorize, async (req, res: BookResponse) => {
     if (isNaN(Number(req.params.id))) {
         return res.status(400).json({ error: "Invalid id" });
     }
