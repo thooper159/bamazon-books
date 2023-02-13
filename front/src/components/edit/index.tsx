@@ -19,6 +19,8 @@ import {
     TextField,
 } from "@mui/material";
 import { title } from "process";
+import { checkAuth } from "../../utils/auth";
+import { Navigate } from "react-router-dom";
 
 interface EditBookProps {
     authors: AuthorRes[];
@@ -422,7 +424,7 @@ export const EditBook = (props: EditBookProps) => {
             <div
                 style={{
                     height: 700,
-                    width: "55%"
+                    width: "55%",
                 }}
             >
                 <DataGrid

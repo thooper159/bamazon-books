@@ -1,32 +1,50 @@
 import React from "react";
 import Navbar from "./components/navbar";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Link,
+    Navigate,
+} from "react-router-dom";
 import Home from "./pages/";
 import Library from "./pages/library";
 import Add from "./pages/add";
 import Search from "./pages/search";
 import Edit from "./pages/edit";
-import Login from "./pages/login";
+import { AuthContext } from "./utils/AuthContext";
 
 function App() {
+    const { isAuthenticated } = React.useContext(AuthContext);
 
-    const requireAuth = () => {
-        //TODO: Implement authentication
+    const ReturnHome = () => {
+        return <Navigate to="/" />;
     };
+
     return (
         <Router>
             <Navbar />
             <Routes>
-                <Route path="/" element={<Home />}/>
+                <Route path="/" element={<Home />} />
                 <Route path="/library" element={<Library />} />
-                <Route path="/add" element={<Add />} />
-                <Route path="/edit" element={<Edit />} />
+                {isAuthenticated ? (
+                    <>
+                        <Route path="/add" element={<Add />} />
+                        <Route path="/edit" element={<Edit />} />
+                    </>
+                ) : (
+                    <>
+                        <Route path="/add" element={<ReturnHome />} />
+                        <Route path="/edit" element={<ReturnHome />} />
+                    </>
+                )}
                 <Route path="/search" element={<Search />} />
                 <Route
                     path="*"
                     element={
                         <>
-                            <h1>404: Not Found</h1> <br /> <br /> <Link to="/">Back to Safety</Link>
+                            <h1>404: Not Found</h1> <br /> <br />{" "}
+                            <Link to="/">Back to Safety</Link>
                         </>
                     }
                 />

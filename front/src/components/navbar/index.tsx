@@ -11,27 +11,28 @@ import {
 import React from "react";
 import { Nav, NavLink, NavMenu } from "./NavbarElements";
 import Cookies from "js-cookie";
+import { checkAuth } from "../../utils/auth";
+import { AuthContext } from "../../utils/AuthContext";
+import { redirect } from "react-router-dom";
 //CSS and structure based on:
 //www.geeksforgeeks.org/how-to-create-a-multi-page-website-using-react-js/
 
 function Navbar() {
     const [loginModalOpen, setLoginModalOpen] = React.useState(false);
     const [loginMessage, setLoginMessage] = React.useState("");
-    const [loggedIn, setLoggedIn] = React.useState(false);
+
+    const { isAuthenticated, setIsAuthenticated } =
+        React.useContext(AuthContext);
 
     React.useEffect(() => {
-        checkLogin();
-    }, []);
-
-    const checkLogin = async () => {
-        let response = await fetch("http://localhost:3000/api/checkLogin", {
-            method: "GET",
-            credentials: "include",
-        });
-        if (response.status === 200) {
-            setLoggedIn(true);
-        }
-    };
+        const sendRequest = async () => {
+            const isAuth = await checkAuth();
+            if (isAuth) {
+                setIsAuthenticated(true);
+            }
+        };
+        sendRequest().catch(console.error);
+    }, [setIsAuthenticated]);
 
     const handleLoginModalOpen = () => {
         setLoginModalOpen(true);
@@ -66,7 +67,7 @@ function Navbar() {
             });
             if (response.status === 200) {
                 handleLoginModalClose();
-                setLoggedIn(true);
+                setIsAuthenticated(true);
             } else {
                 setLoginMessage(response.statusText);
             }
@@ -205,7 +206,8 @@ function Navbar() {
             credentials: "include",
         });
         if (response.status === 200) {
-            setLoggedIn(false);
+            setIsAuthenticated(false);
+            redirect("/");
         }
     };
 
@@ -215,10 +217,15 @@ function Navbar() {
                 <NavMenu>
                     <NavLink to="/">Home</NavLink>
                     <NavLink to="/library">Library</NavLink>
-                    <NavLink to="/add">Add</NavLink>
-                    <NavLink to="/edit">Edit</NavLink>
+                    {isAuthenticated && (
+                        <>
+                            <NavLink to="/add">Add</NavLink>
+                            <NavLink to="/edit">Edit</NavLink>
+                        </>
+                    )}
+
                     <NavLink to="/search">Search</NavLink>
-                    {loggedIn ? (
+                    {isAuthenticated ? (
                         <>
                             <Button
                                 variant="contained"
@@ -229,7 +236,11 @@ function Navbar() {
                             >
                                 Logout
                             </Button>
-                            <Typography variant="body2" color={"white"} gutterBottom>
+                            <Typography
+                                variant="body2"
+                                color={"white"}
+                                gutterBottom
+                            >
                                 {Cookies.get("username")}
                             </Typography>
                         </>
