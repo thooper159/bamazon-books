@@ -77,7 +77,7 @@ let cookieOptions: CookieOptions = {
 
 let authorize: RequestHandler = (req, res, next) => {
     let { token }: { token: string } = req.cookies;
-    console.log(token);
+    // console.log(token);
     if (token === undefined) {
         return res.status(401).json({ error: "Unauthorized" });
     }
