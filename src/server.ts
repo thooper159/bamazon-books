@@ -98,18 +98,21 @@ app.post("/api/login", async function login(req: Request, res: Response) {
         return res.status(400).json({ error: "Username or password invalid" });
     }
     let token = makeToken();
-    console.log(token);
+    // console.log(token);
     tokenStorage[token] = { username };
-    console.log(tokenStorage);
-    res.cookie("token", token, cookieOptions).cookie("username", username, cookieOptions).json({ message: "success" });
+    // console.log(tokenStorage);
+    res.cookie("token", token, cookieOptions)
+        .cookie("username", username, cookieOptions)
+        .json({ message: "success" });
 });
 
-app.get("/api/checkLogin", authorize, async function checkLogin(
-    req: Request,
-    res: Response
-) {
-    res.json({ message: "success" });
-});
+app.get(
+    "/api/checkLogin",
+    authorize,
+    async function checkLogin(req: Request, res: Response) {
+        res.json({ message: "success" });
+    }
+);
 
 app.post("/api/logout", async function logout(req: Request, res: Response) {
     let { token } = req.cookies;
