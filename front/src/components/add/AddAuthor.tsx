@@ -66,14 +66,14 @@ export const AddAuthor = (props: AddAuthorProps) => {
     }
 
     return (
-        <FormControl>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableBody>
-                    <TableRow>
-                        <TableCell width={"30%"} align="right">
-                            <label htmlFor="name">Name</label>
-                        </TableCell>
-                        <TableCell width={"70%"}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableBody>
+                <TableRow>
+                    <TableCell width={"30%"} align="right">
+                        <label htmlFor="name">Name</label>
+                    </TableCell>
+                    <TableCell width={"70%"}>
+                        <FormControl>
                             <TextField
                                 type="text"
                                 id="name"
@@ -81,13 +81,15 @@ export const AddAuthor = (props: AddAuthorProps) => {
                                 value={name}
                                 onChange={handleInputChange}
                             />
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell align="right">
-                            <label htmlFor="bio">Biography</label>
-                        </TableCell>
-                        <TableCell>
+                        </FormControl>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell align="right">
+                        <label htmlFor="bio">Biography</label>
+                    </TableCell>
+                    <TableCell>
+                        <FormControl>
                             <TextareaAutosize
                                 id="bio"
                                 name="bio"
@@ -95,23 +97,23 @@ export const AddAuthor = (props: AddAuthorProps) => {
                                 onChange={handleInputChange}
                                 cols={50}
                             />
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell colSpan={2}>
-                            <Button
-                                variant="contained"
-                                style={{ width: "100%", height: 40 }}
-                                onClick={() => {
-                                    handleSubmitAuthor();
-                                }}
-                            >
-                                Submit
-                            </Button>
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-        </FormControl>
+                        </FormControl>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell colSpan={2}>
+                        <Button
+                            variant="contained"
+                            style={{ width: "100%", height: 40 }}
+                            onClick={() => {
+                                handleSubmitAuthor();
+                            }}
+                        >
+                            Submit
+                        </Button>
+                    </TableCell>
+                </TableRow>
+            </TableBody>
+        </Table>
     );
 };

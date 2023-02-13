@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import Tab from "@mui/material/Tab";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Form, Link } from "react-router-dom";
 import { SearchResults } from "../components/search-results";
 import { AuthorRes, BookRes } from "../types";
 
@@ -131,14 +131,14 @@ function Search() {
             <br />
             <div id="search-box" className="column">
                 <b>Search for books by title, author_id, year, and/or genre.</b>
-                <FormControl fullWidth>
-                    <Table>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell width={"30%"} align="right">
-                                    <label>Title</label>
-                                </TableCell>
-                                <TableCell width={"70%"}>
+                <Table>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell width={"30%"} align="right">
+                                <label>Title</label>
+                            </TableCell>
+                            <TableCell width={"70%"}>
+                                <FormControl>
                                     <TextField
                                         type="text"
                                         name="title"
@@ -146,14 +146,16 @@ function Search() {
                                         onChange={handleInputChange}
                                         sx={{ minWidth: 500 }}
                                     />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right">
-                                    <label>Author</label>
-                                </TableCell>
-                                <TableCell>
-                                    {/* <input type="text" name="author_id" /> */}
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell align="right">
+                                <label>Author</label>
+                            </TableCell>
+                            <TableCell>
+                                {/* <input type="text" name="author_id" /> */}
+                                <FormControl>
                                     <Select
                                         name="author_id"
                                         id="author_id"
@@ -162,7 +164,9 @@ function Search() {
                                         defaultValue=""
                                         displayEmpty
                                     >
-                                        <MenuItem value=""><em>Select an author</em></MenuItem>
+                                        <MenuItem value="">
+                                            <em>Select an author</em>
+                                        </MenuItem>
                                         {authors.map((author) => (
                                             <MenuItem
                                                 key={author.id}
@@ -172,26 +176,30 @@ function Search() {
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right">
-                                    <label>Year</label>
-                                </TableCell>
-                                <TableCell>
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell align="right">
+                                <label>Year</label>
+                            </TableCell>
+                            <TableCell>
+                                <FormControl>
                                     <TextField
                                         type="text"
                                         name="pub_year"
                                         onChange={handleInputChange}
                                         error={!validYear}
                                     />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="right">
-                                    <label>Genre</label>
-                                </TableCell>
-                                <TableCell>
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell align="right">
+                                <label>Genre</label>
+                            </TableCell>
+                            <TableCell>
+                                <FormControl>
                                     <Select
                                         name="genre"
                                         value={genre}
@@ -221,61 +229,59 @@ function Search() {
                                             Sci-Fi
                                         </MenuItem>
                                     </Select>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell colSpan={2} align="center">
-                                    <strong>
-                                        <span id="query-preview"></span>
-                                    </strong>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell colSpan={2}>
-                                    <Button
-                                        style={{ width: "100%", height: 40 }}
-                                        onClick={() => handleSubmit()}
-                                        variant="contained"
-                                    >
-                                        Search
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                    <br />
-                </FormControl>
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colSpan={2} align="center">
+                                <strong>
+                                    <span id="query-preview"></span>
+                                </strong>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colSpan={2}>
+                                <Button
+                                    style={{ width: "100%", height: 40 }}
+                                    onClick={() => handleSubmit()}
+                                    variant="contained"
+                                >
+                                    Search
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+                <br />
                 <b> -- or --</b>
                 <br />
                 <br />
                 <b>Search for book by id</b>
                 <div id="search-box">
-                    <FormControl fullWidth>
-                        <Table>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell>
-                                        <label>ID</label>
-                                    </TableCell>
-                                    <TableCell>
-                                        <TextField
-                                            onChange={handleInputChange}
-                                            type="text"
-                                            name="id"
-                                            error={!validId}
-                                        />
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                        <Button
-                            variant="contained"
-                            style={{ width: "100%", height: 40 }}
-                            onClick={() => handleSubmitId()}
-                        >
-                            Search
-                        </Button>
-                    </FormControl>
+                    <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>
+                                    <label>ID</label>
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        onChange={handleInputChange}
+                                        type="text"
+                                        name="id"
+                                        error={!validId}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                    <Button
+                        variant="contained"
+                        style={{ width: "100%", height: 40 }}
+                        onClick={() => handleSubmitId()}
+                    >
+                        Search
+                    </Button>
                 </div>
             </div>
 

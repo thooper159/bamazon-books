@@ -23,7 +23,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     React.useEffect(() => {
         checkAuth().then((result) => {
             setIsAuthenticated(result);
-            console.log("isAuthenticated: ", result)
         });
     }, []);
 

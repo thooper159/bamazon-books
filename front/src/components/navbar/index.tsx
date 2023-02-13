@@ -150,11 +150,12 @@ function Navbar() {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <Typography variant="h6" gutterBottom>
-                                Sign-up
+                                Sign-up (coming soon)
                             </Typography>
                             <FormControl fullWidth sx={{ mt: 3 }}>
                                 <TextField
                                     required
+                                    disabled
                                     id="signupUsername"
                                     name="signupUsername"
                                     label="Username"
@@ -166,6 +167,7 @@ function Navbar() {
                             <FormControl fullWidth sx={{ mt: 3 }}>
                                 <TextField
                                     required
+                                    disabled
                                     id="signupPassword"
                                     name="signupPassword"
                                     label="Password"
@@ -178,6 +180,7 @@ function Navbar() {
                             <FormControl fullWidth sx={{ mt: 3 }}>
                                 <TextField
                                     required
+                                    disabled
                                     id="signupPasswordConfirm"
                                     name="signupPasswordConfirm"
                                     label="Confirm Password"
@@ -187,7 +190,11 @@ function Navbar() {
                                     type="password"
                                 />
                             </FormControl>
-                            <Button variant="contained" sx={{ mt: 3, mb: 2 }}>
+                            <Button
+                                disabled
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                            >
                                 Sign-up
                             </Button>
                         </Grid>
@@ -241,7 +248,7 @@ function Navbar() {
                                 color={"white"}
                                 gutterBottom
                             >
-                                {Cookies.get("username")}
+                                Hi, {Cookies.get("username")}
                             </Typography>
                         </>
                     ) : (

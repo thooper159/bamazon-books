@@ -117,13 +117,13 @@ export const EditBook = (props: EditBookProps) => {
     };
 
     const columns: GridColumns = [
-        { field: "id", headerName: "ID", width: 70 },
-        { field: "title", headerName: "Title", width: 400 },
+        { field: "id", headerName: "ID", width: 20, editable: false },
+        { field: "title", headerName: "Title", width: 280, editable: false },
         {
             field: "author_id",
             headerName: "Author",
             width: 180,
-            editable: true,
+            editable: false,
             valueGetter: (params) => {
                 const author = props.authors.find(
                     (author) => author.id === params.row.author_id
@@ -131,11 +131,12 @@ export const EditBook = (props: EditBookProps) => {
                 return author?.name;
             },
         },
-        { field: "pub_year", headerName: "Year", width: 100 },
+        { field: "pub_year", headerName: "Year", width: 100, editable: false },
         {
             field: "genre",
             headerName: "Genre",
             width: 130,
+            editable: false,
         },
         {
             field: "edit",
@@ -424,7 +425,7 @@ export const EditBook = (props: EditBookProps) => {
             <div
                 style={{
                     height: 700,
-                    width: "55%",
+                    width: "70%",
                 }}
             >
                 <DataGrid

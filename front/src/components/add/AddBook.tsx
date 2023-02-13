@@ -13,7 +13,7 @@ import TableBody from "@mui/material/TableBody";
 import TableHead from "@mui/material/TableHead";
 import TextField from "@mui/material/TextField";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Form, Link } from "react-router-dom";
 import { AuthorRes } from "../../types";
 
 interface AddBookProps {
@@ -99,14 +99,14 @@ export const AddBook = (props: AddBookProps) => {
     }
 
     return (
-        <FormControl>
-            <Table sx={{ minWidth: 650 }}>
-                <TableBody>
-                    <TableRow>
-                        <TableCell width={"30%"} align="right">
-                            <label htmlFor="title">Title</label>
-                        </TableCell>
-                        <TableCell width={"70%"}>
+        <Table sx={{ minWidth: 650 }}>
+            <TableBody>
+                <TableRow>
+                    <TableCell width={"30%"} align="right">
+                        <label htmlFor="title">Title</label>
+                    </TableCell>
+                    <TableCell width={"70%"}>
+                        <FormControl>
                             <TextField
                                 id="title"
                                 name="title"
@@ -116,13 +116,15 @@ export const AddBook = (props: AddBookProps) => {
                                 onChange={handleInputChange}
                                 error={!validTitle}
                             />
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell align="right">
-                            <label htmlFor="author_id">Author</label>
-                        </TableCell>
-                        <TableCell>
+                        </FormControl>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell align="right">
+                        <label htmlFor="author_id">Author</label>
+                    </TableCell>
+                    <TableCell>
+                        <FormControl>
                             <Select
                                 name="author_id"
                                 id="author_id"
@@ -140,13 +142,15 @@ export const AddBook = (props: AddBookProps) => {
                                     </MenuItem>
                                 ))}
                             </Select>
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell align="right">
-                            <label htmlFor="pub_year">Year</label>
-                        </TableCell>
-                        <TableCell>
+                        </FormControl>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell align="right">
+                        <label htmlFor="pub_year">Year</label>
+                    </TableCell>
+                    <TableCell>
+                        <FormControl>
                             <TextField
                                 type="text"
                                 id="pub_year"
@@ -155,13 +159,15 @@ export const AddBook = (props: AddBookProps) => {
                                 onChange={handleInputChange}
                                 error={!validYear}
                             />
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell align="right">
-                            <label htmlFor="genre">Genre</label>
-                        </TableCell>
-                        <TableCell>
+                        </FormControl>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell align="right">
+                        <label htmlFor="genre">Genre</label>
+                    </TableCell>
+                    <TableCell>
+                        <FormControl>
                             <Select
                                 value={genre}
                                 name="genre"
@@ -182,23 +188,23 @@ export const AddBook = (props: AddBookProps) => {
                                 <MenuItem value={"mystery"}>Mystery</MenuItem>
                                 <MenuItem value={"sci-fi"}>Sci-Fi</MenuItem>
                             </Select>
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell colSpan={2}>
-                            <Button
-                                variant="contained"
-                                style={{ width: "100%", height: 40 }}
-                                onClick={() => {
-                                    handleSubmitBook();
-                                }}
-                            >
-                                Submit
-                            </Button>
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-        </FormControl>
+                        </FormControl>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell colSpan={2}>
+                        <Button
+                            variant="contained"
+                            style={{ width: "100%", height: 40 }}
+                            onClick={() => {
+                                handleSubmitBook();
+                            }}
+                        >
+                            Submit
+                        </Button>
+                    </TableCell>
+                </TableRow>
+            </TableBody>
+        </Table>
     );
 };

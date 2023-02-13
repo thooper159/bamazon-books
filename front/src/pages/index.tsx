@@ -10,12 +10,15 @@ function Home() {
             <br />
             <b>
                 Check out our collection in the{" "}
-                <Link to="/library">Library</Link>
+                <Link to="/library">Library</Link> page or search for a specific
+                book in the <Link to="/search">Search</Link> page.
             </b>
             <br />
             <br />
             <b>
-                Add your own books and authors <Link to="/add">here</Link>
+                Please log in to add or edit books in the{" "}
+                <Link to="/add">Add</Link> and <Link to="/edit">Edit</Link>{" "}
+                pages.
             </b>
         </div>
     );
