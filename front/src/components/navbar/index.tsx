@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import React from "react";
 import { Nav, NavLink, NavMenu } from "./NavbarElements";
-import Cookies from "js-cookie";
 import { checkAuth } from "../../utils/auth";
 import { AuthContext } from "../../utils/AuthContext";
 import { redirect } from "react-router-dom";
@@ -21,9 +20,8 @@ function Navbar() {
     const [loginModalOpen, setLoginModalOpen] = React.useState(false);
     const [loginMessage, setLoginMessage] = React.useState("");
 
-    const { isAuthenticated, setIsAuthenticated } =
+    const { isAuthenticated, setIsAuthenticated, username } =
         React.useContext(AuthContext);
-
     React.useEffect(() => {
         const sendRequest = async () => {
             const isAuth = await checkAuth();
@@ -248,7 +246,7 @@ function Navbar() {
                                 color={"white"}
                                 gutterBottom
                             >
-                                Hi, {Cookies.get("username")}
+                                Hi, {username}
                             </Typography>
                         </>
                     ) : (

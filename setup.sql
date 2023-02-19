@@ -1,6 +1,7 @@
 CREATE TABLE books (
     id INTEGER PRIMARY KEY, -- can change to be integer if you want
     author_id INTEGER,
+    username TEXT,
     title TEXT,
     pub_year TEXT,
     genre TEXT,

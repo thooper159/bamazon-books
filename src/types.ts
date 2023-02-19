@@ -14,6 +14,7 @@ type Genres = z.infer<typeof Genres>;
 
 const Book = z.object({
     author_id: z.string().regex(/^\d+$/, { message: "Invalid book id" }),
+    username: z.string().min(1, { message: "Missing username" }),
     title: z
         .string()
         .min(1, { message: "Missing title" })

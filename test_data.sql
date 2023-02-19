@@ -44,55 +44,82 @@ VALUES
     );
 
 INSERT INTO
-    books(id, author_id, title, pub_year, genre)
+    books(id, author_id, username, title, pub_year, genre)
 VALUES
-    (1, 1, 'Anthem', '1938', 'dystopian');
+    (1, 1, "admin", 'Anthem', '1938', 'dystopian');
 
 INSERT INTO
-    books(id, author_id, title, pub_year, genre)
+    books(id, author_id, username, title, pub_year, genre)
 VALUES
-    (2, 2, 'The Hobbit', '1937', 'fantasy');
+    (2, 2, "admin", 'The Hobbit', '1937', 'fantasy');
 
 INSERT INTO
-    books(id, author_id, title, pub_year, genre)
+    books(id, author_id, username, title, pub_year, genre)
 VALUES
     (
         3,
         3,
+        "admin",
         'Harry Potter and the Sorcerer''s Stone',
         '1997',
         'fantasy'
     );
 
 INSERT INTO
-    books(id, author_id, title, pub_year, genre)
+    books(id, author_id, username, title, pub_year, genre)
 VALUES
     (
         4,
         3,
+        "admin",
         'Harry Potter and the Chamber of Secrets',
         '1998',
         'fantasy'
     );
 
 INSERT INTO
-    books(id, author_id, title, pub_year, genre)
+    books(id, author_id, username, title, pub_year, genre)
 VALUES
-    (5, 4, 'The Shining', '1977', 'horror');
+    (
+        5,
+        4,
+        "applesauce",
+        'The Shining',
+        '1977',
+        'horror'
+    );
 
 INSERT INTO
-    books(id, author_id, title, pub_year, genre)
+    books(id, author_id, username, title, pub_year, genre)
 VALUES
-    (6, 4, 'It', '1986', 'horror');
+    (6, 4, "applesauce", 'It', '1986', 'horror');
 
 INSERT INTO
-    books(id, author_id, title, pub_year, genre)
+    books(id, author_id, username, title, pub_year, genre)
 VALUES
-    (7, 4, 'The Green Mile', '1996', 'mystery');
-
+    (
+        7,
+        4,
+        "applesauce",
+        'The Green Mile',
+        '1996',
+        'mystery'
+    );
 
 -- password
-INSERT INTO users(username, password) VALUES ('admin', '$argon2id$v=19$m=65536,t=3,p=4$0toyJJQ6Xdv5rUQq1cCoCQ$hYs/2qQrQDy4gld9v4fy0kiQnBzpAu/FWyJgyTq3Ito');
+INSERT INTO
+    users(username, password)
+VALUES
+    (
+        'admin',
+        '$argon2id$v=19$m=65536,t=3,p=4$0toyJJQ6Xdv5rUQq1cCoCQ$hYs/2qQrQDy4gld9v4fy0kiQnBzpAu/FWyJgyTq3Ito'
+    );
 
 -- abc
-INSERT INTO users(username, password) VALUES ('applesauce', '$argon2id$v=19$m=65536,t=3,p=4$aet/Up/t2f9Bu8teKj5SZA$KTYJ35q136nHVyphnqR3Zs9an5gS0hn1inw5YUoi8TU');
+INSERT INTO
+    users(username, password)
+VALUES
+    (
+        'applesauce',
+        '$argon2id$v=19$m=65536,t=3,p=4$aet/Up/t2f9Bu8teKj5SZA$KTYJ35q136nHVyphnqR3Zs9an5gS0hn1inw5YUoi8TU'
+    );

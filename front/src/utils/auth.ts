@@ -4,8 +4,9 @@ export const checkAuth = async () => {
         credentials: "include",
     });
     if (response.status === 200) {
-        return true;
+        let { username } = await response.json();
+        return { success: true, username: username };
     } else {
-        return false;
+        return { success: false };
     }
 };

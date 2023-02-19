@@ -70,8 +70,8 @@ function makeToken() {
 let tokenStorage: { [key: string]: { username: string } } = {};
 
 let cookieOptions: CookieOptions = {
-    httpOnly: false, //
-    secure: false,
+    httpOnly: true, //
+    secure: true,
     sameSite: "strict",
 };
 
@@ -114,7 +114,10 @@ app.get(
     "/api/checkLogin",
     authorize,
     async function checkLogin(req: Request, res: Response) {
-        res.json({ message: "success" });
+        //return the username
+        let { token } = req.cookies;
+        let username = tokenStorage[token].username;
+        res.json({ username });
     }
 );
 
@@ -193,6 +196,7 @@ async function verifyBookData(
         | Request<
               ParamsDictionary,
               | {
+                    username: string;
                     id: string;
                     author_id: string;
                     title: string;
@@ -214,6 +218,7 @@ async function verifyBookData(
               ParamsDictionary,
               | { error: string }
               | {
+                    username: string;
                     id: string;
                     author_id: string;
                     title: string;
@@ -300,6 +305,8 @@ async function verifyBookData(
 }
 
 app.post("/api/books", authorize, async (req, res: BookResponse) => {
+    let { token } = req.cookies;
+    let username = tokenStorage[token].username;
     //make sure req body matches Book type
     if (!req.body) {
         return res.status(400).json({ error: "Missing request body" });
@@ -310,7 +317,7 @@ app.post("/api/books", authorize, async (req, res: BookResponse) => {
     }
     //insert book
     let statement = await db.prepare(
-        "INSERT INTO books(id, author_id, title, pub_year, genre) VALUES (?, ?, ?, ?, ?)"
+        "INSERT INTO books(id, author_id, username, title, pub_year, genre) VALUES (?, ?, ?, ?, ?, ?)"
     );
     //get next id
     let id = await db.get("SELECT MAX(id) FROM books");
@@ -318,6 +325,7 @@ app.post("/api/books", authorize, async (req, res: BookResponse) => {
     await statement.bind([
         id,
         req.body.author_id,
+        username,
         req.body.title,
         req.body.pub_year,
         req.body.genre,
@@ -347,6 +355,12 @@ app.put(
         );
         if (!currentBook) {
             return res.status(404).json({ error: "Book not found" });
+        }
+        //check if user is authorized to edit book
+        let { token } = req.cookies;
+        let username = tokenStorage[token].username;
+        if (currentBook.username !== username) {
+            return res.status(403).json({ error: "Unauthorized" });
         }
         if (!req.body) {
             return res.status(400).json({ error: "Missing request body" });
@@ -397,6 +411,10 @@ app.delete("/api/books/:id", authorize, async (req, res: BookResponse) => {
     if (!book) {
         return res.status(404).json({ error: "Book not found" });
     }
+    if(book.username !== tokenStorage[req.cookies.token].username) {
+        return res.status(403).json({ error: "Unauthorized" });
+    }
+    
     await db.run("DELETE FROM books WHERE id = ?", [req.params.id]);
     return res.sendStatus(200);
 });

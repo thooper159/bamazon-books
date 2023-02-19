@@ -21,6 +21,7 @@ import {
 import { title } from "process";
 import { checkAuth } from "../../utils/auth";
 import { Form, Navigate } from "react-router-dom";
+import { AuthContext } from "../../utils/AuthContext";
 
 interface EditBookProps {
     authors: AuthorRes[];
@@ -45,6 +46,7 @@ export const EditBook = (props: EditBookProps) => {
         React.useState<boolean>(false);
     const [editModalOpen, setEditModalOpen] = React.useState<boolean>(false);
     const [selectedBook, setSelectedBook] = React.useState<BookRes>();
+    const { username } = React.useContext(AuthContext);
 
     const handleEditModalOpen = () => {
         setEditModalOpen(true);
@@ -67,7 +69,10 @@ export const EditBook = (props: EditBookProps) => {
         fetchData(request)
             .then((result) => {
                 setIsLoaded(true);
-                setBooks(result);
+                //set only books that belong to the user
+                setBooks(
+                    result.filter((book: BookRes) => book.username === username)
+                );
             })
             .catch((error) => {
                 setIsLoaded(true);
@@ -104,6 +109,7 @@ export const EditBook = (props: EditBookProps) => {
             body: JSON.stringify({
                 title: title,
                 author_id: author_id,
+                username: username,
                 pub_year: pub_year,
                 genre: genre,
             }),

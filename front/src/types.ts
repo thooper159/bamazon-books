@@ -11,6 +11,7 @@ export type Genres = typeof genres[number];
 
 type Book = {
     author_id: string;
+    username: string;
     title: string;
     pub_year: string;
     genre: Genres;

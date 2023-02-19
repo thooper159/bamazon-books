@@ -13,8 +13,8 @@ import TableBody from "@mui/material/TableBody";
 import TableHead from "@mui/material/TableHead";
 import TextField from "@mui/material/TextField";
 import React from "react";
-import { Form, Link } from "react-router-dom";
 import { AuthorRes } from "../../types";
+import { AuthContext } from "../../utils/AuthContext";
 
 interface AddBookProps {
     authors: AuthorRes[];
@@ -27,7 +27,6 @@ export const AddBook = (props: AddBookProps) => {
     const [genre, setGenre] = React.useState<string>("");
     const [validTitle, setValidTitle] = React.useState<boolean>(false);
     const [validYear, setValidYear] = React.useState<boolean>(false);
-
     async function handleSubmitBook() {
         if (!(title && author_id && pub_year && genre)) {
             alert("Please fill out all fields");
