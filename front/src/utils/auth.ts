@@ -1,5 +1,5 @@
 export const checkAuth = async () => {
-    const endpoint = process.env.REACT_APP_ENDPOINT;
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
     let response = await fetch(endpoint + "/api/checkLogin", {
         method: "GET",
         credentials: "include",
