@@ -22,7 +22,8 @@ export const AddAuthor = (props: AddAuthorProps) => {
             alert("Please fill out all fields");
             return;
         }
-        const request = new Request("http://localhost:3000/api/authors", {
+        const endpoint = process.env.REACT_APP_API_ENDPOINT;
+        const request = new Request(endpoint + "/api/authors", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

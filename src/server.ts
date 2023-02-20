@@ -130,7 +130,7 @@ app.post("/api/logout", async function logout(req: Request, res: Response) {
         return res.send();
     }
     delete tokenStorage[token];
-    res.clearCookie("token", cookieOptions).send();
+    res.clearCookie("token", cookieOptions).clearCookie("username", cookieOptions).send();
 });
 
 app.get("/api/books", async (req, res: BookResponse) => {

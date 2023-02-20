@@ -32,7 +32,8 @@ export const AddBook = (props: AddBookProps) => {
             alert("Please fill out all fields");
             return;
         }
-        const request = new Request("http://localhost:3000/api/books", {
+        const endpoint = process.env.REACT_APP_API_ENDPOINT;
+        const request = new Request(endpoint + "/api/books", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

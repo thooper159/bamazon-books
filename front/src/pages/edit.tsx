@@ -8,12 +8,13 @@ const fetchData = async (request: Request) => {
 };
 
 function Edit() {
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
     const [authors, setAuthors] = React.useState<AuthorRes[]>([]);
     const [error, setError] = React.useState<Error | null>(null);
     const [updated, setUpdated] = React.useState<boolean>(false);
 
     React.useEffect(() => {
-        const request = new Request("http://localhost:3000/api/authors");
+        const request = new Request(endpoint + "/api/authors");
         fetchData(request)
             .then((result) => {
                 setAuthors(result);

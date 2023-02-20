@@ -21,6 +21,7 @@ const fetchData = async (request: Request) => {
 };
 
 function Search() {
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
     const [title, setTitle] = React.useState<string>("");
     const [author_id, setAuthor] = React.useState<string>("");
     const [pub_year, setYear] = React.useState<string>("");
@@ -32,7 +33,7 @@ function Search() {
     const [authors, setAuthors] = React.useState<AuthorRes[]>([]);
 
     React.useEffect(() => {
-        const request = new Request("http://localhost:3000/api/authors");
+        const request = new Request(endpoint + "/api/authors");
         fetchData(request)
             .then((result) => {
                 setAuthors(result);
@@ -96,15 +97,15 @@ function Search() {
             params.delete(key);
         });
         if (params.toString() === "") {
-            setQuery("http://localhost:3000/api/books");
+            setQuery(endpoint + "/api/books");
         } else {
-            const queryBuilder = `http://localhost:3000/api/books?${params.toString()}`;
+            const queryBuilder = endpoint + `/api/books?${params.toString()}`;
             setQuery(queryBuilder);
         }
     }
 
     function handleSubmitId(): void {
-        const queryBuilder = `http://localhost:3000/api/books/${id}`;
+        const queryBuilder = endpoint + `/api/books/${id}`;
         setQuery(queryBuilder);
     }
 

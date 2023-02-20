@@ -38,6 +38,7 @@ const sendRequest = async (request: Request) => {
 };
 
 export const EditBook = (props: EditBookProps) => {
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
     const [books, setBooks] = React.useState<BookRes[]>([]);
     const [error, setError] = React.useState<Error | null>(null);
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
@@ -65,7 +66,7 @@ export const EditBook = (props: EditBookProps) => {
     };
 
     React.useEffect(() => {
-        const request = new Request("http://localhost:3000/api/books");
+        const request = new Request(endpoint + "/api/books");
         fetchData(request)
             .then((result) => {
                 setIsLoaded(true);
@@ -81,7 +82,7 @@ export const EditBook = (props: EditBookProps) => {
     }, [reload]);
 
     const handleDelete = async (id: string) => {
-        const request = new Request(`http://localhost:3000/api/books/${id}`, {
+        const request = new Request(endpoint +`/api/books/${id}`, {
             method: "DELETE",
             credentials: "include",
         });
@@ -101,7 +102,7 @@ export const EditBook = (props: EditBookProps) => {
         genre: string,
         id: string
     ) => {
-        const request = new Request(`http://localhost:3000/api/books/${id}`, {
+        const request = new Request(endpoint + `/api/books/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

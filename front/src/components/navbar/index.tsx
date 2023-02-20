@@ -17,20 +17,20 @@ import { redirect } from "react-router-dom";
 //www.geeksforgeeks.org/how-to-create-a-multi-page-website-using-react-js/
 
 function Navbar() {
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
     const [loginModalOpen, setLoginModalOpen] = React.useState(false);
     const [loginMessage, setLoginMessage] = React.useState("");
 
-    const { isAuthenticated, setIsAuthenticated, username } =
+    const { isAuthenticated, setIsAuthenticated, username, setUsername } =
         React.useContext(AuthContext);
     React.useEffect(() => {
         const sendRequest = async () => {
             const isAuth = await checkAuth();
-            if (isAuth) {
-                setIsAuthenticated(true);
-            }
+            setIsAuthenticated(isAuth.success);
+            setUsername(isAuth.username);
         };
         sendRequest().catch(console.error);
-    }, [setIsAuthenticated]);
+    }, [isAuthenticated]);
 
     const handleLoginModalOpen = () => {
         setLoginModalOpen(true);
@@ -52,7 +52,7 @@ function Navbar() {
                 alert("Please fill in all fields");
                 return;
             }
-            let response = await fetch("http://localhost:3000/api/login", {
+            let response = await fetch(endpoint + "/api/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -203,7 +203,7 @@ function Navbar() {
     };
 
     const logout = async () => {
-        let response = await fetch("http://localhost:3000/api/logout", {
+        let response = await fetch(endpoint + "/api/logout", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

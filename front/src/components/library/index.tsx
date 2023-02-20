@@ -9,13 +9,14 @@ const fetchData = async (request: Request) => {
 };
 
 export function LibraryTables(): JSX.Element {
+    const endpoint = process.env.REACT_APP_API_ENDPOINT;
     const [error, setError] = useState<Error | null>(null);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [books, setBooks] = useState<BookRes[]>([]);
     const [authors, setAuthors] = useState<AuthorRes[]>([]);
 
     useEffect(() => {
-        const request = new Request("http://localhost:3000/api/books");
+        const request = new Request(endpoint + "/api/books");
         fetchData(request)
             .then((result) => {
                 setIsLoaded(true);
@@ -28,7 +29,7 @@ export function LibraryTables(): JSX.Element {
     }, []);
 
     useEffect(() => {
-        const request = new Request("http://localhost:3000/api/authors");
+        const request = new Request(endpoint + "/api/authors");
         fetchData(request)
             .then((result) => {
                 setIsLoaded(true);
