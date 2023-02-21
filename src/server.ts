@@ -20,6 +20,7 @@ import { z } from "zod";
 import { randomBytes } from "crypto";
 import argon2 from "argon2";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,6 +59,21 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    handler: function (req, res, next) {
+        console.log(`IP ${req.ip} has been rate limited`);
+        res.status(429).send(
+            "Too many requests from this IP, please try again later."
+        );
+    },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+app.use("/api", limiter);
 
 // create database "connection"
 let db = await open({
