@@ -27,6 +27,12 @@ const __dirname = path.dirname(__filename);
 let app = express();
 
 app.use(helmet());
+//add 	Permissions Policy header
+app.use(
+    helmet.permittedCrossDomainPolicies({
+        permittedPolicies: "none",
+    })
+);
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -132,7 +138,9 @@ app.post("/api/logout", async function logout(req: Request, res: Response) {
         return res.send();
     }
     delete tokenStorage[token];
-    res.clearCookie("token", cookieOptions).clearCookie("username", cookieOptions).send();
+    res.clearCookie("token", cookieOptions)
+        .clearCookie("username", cookieOptions)
+        .send();
 });
 
 app.get("/api/books", async (req, res: BookResponse) => {
@@ -413,10 +421,10 @@ app.delete("/api/books/:id", authorize, async (req, res: BookResponse) => {
     if (!book) {
         return res.status(404).json({ error: "Book not found" });
     }
-    if(book.username !== tokenStorage[req.cookies.token].username) {
+    if (book.username !== tokenStorage[req.cookies.token].username) {
         return res.status(403).json({ error: "Unauthorized" });
     }
-    
+
     await db.run("DELETE FROM books WHERE id = ?", [req.params.id]);
     return res.sendStatus(200);
 });
