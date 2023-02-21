@@ -19,29 +19,31 @@ import cors from "cors";
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import argon2 from "argon2";
+import helmet from "helmet";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let app = express();
 
-// app.use(express.static("public"));
+app.use(helmet());
+
 app.use(express.static(path.join(__dirname, "public")));
 
 //allow cross origin requests
-app.use(function (req, res, next) {
-    //allow GET, POST, PUT, DELETE, OPTIONS
-    res.header(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-});
+// app.use(function (req, res, next) {
+//     //allow GET, POST, PUT, DELETE, OPTIONS
+//     res.header(
+//         "Access-Control-Allow-Methods",
+//         "GET, POST, PUT, DELETE, OPTIONS"
+//     );
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
+// });
 app.use(
     cors({
         origin: ["http://localhost:3000", "http://localhost:3001"],

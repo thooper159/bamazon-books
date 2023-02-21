@@ -29,6 +29,7 @@ export const BookTable: React.FC<TableProps> = (props: TableProps) => {
                     <TableCell>Author</TableCell>
                     <TableCell>Year</TableCell>
                     <TableCell>Genre</TableCell>
+                    <TableCell>Added by</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -53,6 +54,9 @@ export const BookTable: React.FC<TableProps> = (props: TableProps) => {
                                 </TableCell>
                                 <TableCell width={"25%"}>
                                     {book.genre}
+                                </TableCell>
+                                <TableCell width={"10%"}>
+                                    {book.username}
                                 </TableCell>
                             </TableRow>
                         ))
