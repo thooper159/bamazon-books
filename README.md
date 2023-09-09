@@ -1,3 +1,2 @@
-# CS-T480 HW 5
 Bamazon Books
-By Tyler Hooper | tjh346
+A simple library system built in Typescript with SQLite, with a React front-end
